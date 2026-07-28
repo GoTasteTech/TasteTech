@@ -1,0 +1,229 @@
+<!-- Lacak Pesanan - Halaman untuk cek pesanan berdasarkan ID -->
+<section style="padding-top: 90px; padding-bottom: 60px; min-height: 100vh;">
+    <div class="container">
+
+        <!-- Header -->
+        <div style="text-align:center; margin-bottom: 36px;">
+            <div style="font-size:3.5rem; margin-bottom:12px;">🔍</div>
+            <h1 style="font-size:2.2rem; font-weight:800; color:#FFFFFF;">
+                Lacak <span class="gradient-text">Pesanan Saya</span>
+            </h1>
+            <p style="color:#A0A0B8; max-width:520px; margin:10px auto 0; line-height:1.6;">
+                Tidak menemukan pesananmu di riwayat? Masukkan ID Pesanan untuk melacak status pengirimanmu
+            </p>
+        </div>
+
+        <!-- Main Card -->
+        <div style="max-width:600px; margin:0 auto;">
+
+            <!-- Search Box -->
+            <div style="background:rgba(30,30,46,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:32px; margin-bottom:24px;">
+                <form id="lacak-form" onsubmit="lacakPesanan(event)">
+                    <label style="display:block; color:#FFFFFF; font-weight:700; margin-bottom:10px; font-size:0.95rem;">
+                        📦 Masukkan ID Pesanan
+                    </label>
+                    <div style="position:relative; margin-bottom:16px;">
+                        <input
+                            type="text"
+                            id="order-id-input"
+                            placeholder="Contoh: GF-409001"
+                            style="width:100%; padding:16px 20px 16px 48px; background:rgba(255,255,255,0.05); border:1.5px solid rgba(255,255,255,0.12); border-radius:14px; color:#FFFFFF; font-size:1rem; font-weight:600; outline:none; transition:border-color 0.3s, box-shadow 0.3s; letter-spacing:1px; text-transform:uppercase;"
+                            onfocus="this.style.borderColor='#FF8C5A'; this.style.boxShadow='0 0 0 3px rgba(255,140,90,0.15)'"
+                            onblur="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.boxShadow='none'"
+                            oninput="this.value=this.value.toUpperCase()"
+                            autocomplete="off"
+                            id="lacak-input"
+                        >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                             style="position:absolute; left:16px; top:50%; transform:translateY(-50%); width:20px; height:20px; color:#80809E;">
+                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                        </svg>
+                    </div>
+                    <button type="submit" id="lacak-submit-btn"
+                        class="btn-primary"
+                        style="width:100%; padding:16px; border-radius:14px; font-size:1rem; font-weight:800; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:transform 0.2s, opacity 0.2s;"
+                        onmouseover="this.style.transform='translateY(-2px)'"
+                        onmouseout="this.style.transform=''">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        Lacak Pesanan
+                    </button>
+                </form>
+            </div>
+
+            <!-- Result Area -->
+            <div id="result-area" style="display:none;"></div>
+
+            <!-- Not Found State (awalnya tersembunyi) -->
+            <div id="not-found-area" style="display:none; background:rgba(231,76,60,0.08); border:1px solid rgba(231,76,60,0.2); border-radius:18px; padding:32px; text-align:center;">
+                <div style="font-size:3rem; margin-bottom:12px;">😕</div>
+                <h3 style="color:#FFFFFF; font-size:1.2rem; font-weight:700; margin-bottom:10px;">Pesanan Tidak Ditemukan</h3>
+                <p id="not-found-msg" style="color:#A0A0B8; font-size:0.9rem; line-height:1.6; margin-bottom:20px;">
+                    ID pesanan tidak ditemukan. Pastikan ID yang kamu masukkan sudah benar.
+                </p>
+                <div style="background:rgba(255,255,255,0.04); border-radius:12px; padding:16px; text-align:left; margin-bottom:20px;">
+                    <div style="color:#FFFFFF; font-weight:700; font-size:0.85rem; margin-bottom:8px;">💡 Tips:</div>
+                    <ul style="color:#A0A0B8; font-size:0.82rem; line-height:1.8; padding-left:16px; margin:0;">
+                        <li>ID pesanan dimulai dengan <strong style="color:#FF8C5A;">GF-</strong> diikuti 6 angka</li>
+                        <li>Cek struk/bukti pesanan yang kamu terima</li>
+                        <li>Pesanan tersimpan di server selama sesi berlangsung</li>
+                        <li>Jika server restart, data pesanan akan hilang (in-memory)</li>
+                        <li>Hubungi kami via WhatsApp untuk bantuan lebih lanjut</li>
+                    </ul>
+                </div>
+                <a href="https://wa.me/6289668263410?text=Halo+TasteTech!+Saya+ingin+menanyakan+pesanan+saya"
+                   target="_blank"
+                   style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#FFFFFF; padding:12px 24px; border-radius:12px; text-decoration:none; font-weight:700; font-size:0.9rem;">
+                    💬 Hubungi via WhatsApp
+                </a>
+            </div>
+
+            <!-- Divider -->
+            <div style="display:flex; align-items:center; gap:14px; margin:28px 0;">
+                <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+                <span style="color:#606080; font-size:0.85rem; white-space:nowrap;">atau masuk ke riwayat pesanan</span>
+                <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+            </div>
+
+            <!-- History Link -->
+            <a href="/riwayat"
+               style="display:flex; align-items:center; justify-content:center; gap:10px; background:rgba(30,30,46,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; text-decoration:none; color:#FFFFFF; font-weight:700; font-size:0.95rem; transition:border-color 0.3s, background 0.3s;"
+               onmouseover="this.style.borderColor='rgba(255,140,90,0.3)'; this.style.background='rgba(255,140,90,0.06)'"
+               onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.background='rgba(30,30,46,0.6)'">
+                📜 Lihat Riwayat Pesanan Saya
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#FF8C5A;">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </a>
+
+            <!-- Info Box -->
+            <div style="background:rgba(0,150,255,0.06); border:1px solid rgba(0,150,255,0.15); border-radius:14px; padding:16px 20px; margin-top:20px; display:flex; gap:12px; align-items:flex-start;">
+                <span style="font-size:1.2rem; flex-shrink:0;">ℹ️</span>
+                <div>
+                    <div style="color:#00B0FF; font-weight:700; font-size:0.85rem; margin-bottom:4px;">Mengapa pesanan tidak muncul di riwayat?</div>
+                    <div style="color:#A0A0B8; font-size:0.8rem; line-height:1.6;">
+                        Riwayat pesanan disimpan di browser (cookie) perangkat yang kamu gunakan saat memesan. Jika kamu membuka dari perangkat/browser berbeda, atau cookie telah dihapus, pesananmu tidak akan muncul otomatis. Gunakan fitur lacak pesanan di atas dengan ID pesananmu.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+async function lacakPesanan(e) {
+    e.preventDefault();
+    const input = document.getElementById('order-id-input');
+    const resultArea = document.getElementById('result-area');
+    const notFoundArea = document.getElementById('not-found-area');
+    const submitBtn = document.getElementById('lacak-submit-btn');
+    const notFoundMsg = document.getElementById('not-found-msg');
+
+    const orderId = input.value.trim().toUpperCase();
+    if (!orderId) {
+        input.style.borderColor = '#E74C3C';
+        input.style.boxShadow = '0 0 0 3px rgba(231,76,60,0.15)';
+        input.focus();
+        setTimeout(() => {
+            input.style.borderColor = 'rgba(255,255,255,0.12)';
+            input.style.boxShadow = 'none';
+        }, 2000);
+        return;
+    }
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span style="display:inline-block;animation:spin 0.8s linear infinite">⏳</span> Mencari pesanan...`;
+    resultArea.style.display = 'none';
+    notFoundArea.style.display = 'none';
+
+    try {
+        const resp = await fetch(`/api/order/${encodeURIComponent(orderId)}`);
+        const data = await resp.json();
+
+        if (data.success && data.order) {
+            const o = data.order;
+            const statusMap = {
+                'pending':    { label: '🕐 Menunggu Konfirmasi', color: '#FFC107', bg: 'rgba(255,179,0,0.15)' },
+                'processing': { label: '👨‍🍳 Sedang Dimasak',       color: '#00B0FF', bg: 'rgba(0,150,255,0.15)' },
+                'delivery':   { label: '🚚 Dalam Pengiriman',     color: '#E040FB', bg: 'rgba(156,39,176,0.15)' },
+                'completed':  { label: '✅ Selesai',              color: '#2ECC71', bg: 'rgba(46,204,113,0.15)' },
+                'cancelled':  { label: '❌ Dibatalkan',           color: '#E74C3C', bg: 'rgba(231,76,60,0.15)' },
+            };
+            const st = statusMap[o.status] || { label: o.status, color: '#A0A0B8', bg: 'rgba(255,255,255,0.08)' };
+            const itemsHtml = (o.items || []).map(it =>
+                `<div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:4px 0;">
+                    <span style="color:#D1D1E0;">${it.menu_name} ×${it.quantity}</span>
+                    <span style="color:#FFFFFF;font-weight:600;">Rp ${formatRupiahJS(it.sub_total)}</span>
+                </div>`
+            ).join('');
+
+            resultArea.innerHTML = `
+                <div style="background:rgba(30,30,46,0.85);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:24px;animation:fadeInUp 0.4s ease;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <div>
+                            <div style="font-size:0.75rem;color:#A0A0B8;">ID Pesanan</div>
+                            <div style="font-size:1.3rem;font-weight:800;color:#FF8C5A;letter-spacing:1px;">${o.id}</div>
+                            <div style="font-size:0.82rem;color:#80809E;margin-top:4px;">👤 ${o.customer_name} &bull; 📞 ${o.phone}</div>
+                        </div>
+                        <span style="background:${st.bg};color:${st.color};border:1px solid ${st.color}33;padding:8px 16px;border-radius:30px;font-weight:700;font-size:0.85rem;">${st.label}</span>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <div style="font-size:0.8rem;color:#A0A0B8;margin-bottom:8px;font-weight:700;">🛒 Item Pesanan</div>
+                        ${itemsHtml}
+                        <div style="border-top:1px solid rgba(255,255,255,0.06);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;">
+                            <span style="color:#FFFFFF;font-weight:700;">Total</span>
+                            <span style="color:#FF8C5A;font-weight:800;font-size:1.05rem;">Rp ${formatRupiahJS(o.grand_total)}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+                        <a href="/lacak/${o.id}" class="btn-primary" style="flex:1;padding:12px;border-radius:12px;font-weight:700;text-decoration:none;text-align:center;min-width:120px;font-size:0.9rem;">
+                            🚀 Lacak Pengiriman
+                        </a>
+                        <a href="/pesanan/${o.id}" class="btn-outline" style="flex:1;padding:12px;border-radius:12px;font-weight:700;text-decoration:none;text-align:center;min-width:120px;font-size:0.9rem;">
+                            📋 Detail Pesanan
+                        </a>
+                    </div>
+                </div>`;
+            resultArea.style.display = 'block';
+        } else {
+            notFoundMsg.textContent = `Pesanan dengan ID "${orderId}" tidak ditemukan di sistem kami.`;
+            notFoundArea.style.display = 'block';
+        }
+    } catch (err) {
+        notFoundMsg.textContent = 'Gagal menghubungi server. Pastikan koneksi internetmu stabil dan coba lagi.';
+        notFoundArea.style.display = 'block';
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Lacak Pesanan`;
+}
+
+function formatRupiahJS(num) {
+    return Math.floor(num || 0).toLocaleString('id-ID');
+}
+
+// Check URL params for pre-filled ID
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+        const input = document.getElementById('order-id-input');
+        if (input) {
+            input.value = id.toUpperCase();
+            // Auto-search
+            setTimeout(() => {
+                const form = document.getElementById('lacak-form');
+                if (form) form.dispatchEvent(new Event('submit'));
+            }, 300);
+        }
+    }
+})();
+</script>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>

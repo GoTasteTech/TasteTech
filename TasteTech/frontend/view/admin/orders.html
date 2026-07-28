@@ -1,0 +1,948 @@
+<!-- Admin Orders - Full Order Processing System -->
+<div class="page-top">
+    <div>
+        <h1 class="page-heading">Manajemen Pesanan</h1>
+        <p class="page-sub">Proses dan selesaikan semua pesanan pelanggan secara real-time</p>
+    </div>
+    <div class="page-actions">
+        <div class="order-live-indicator" id="order-live-ind">
+            <span class="live-dot"></span> Live Update
+        </div>
+        <span class="total-badge" id="total-order-badge">Total: <strong>{{len .Orders}}</strong> pesanan</span>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="order-stats-row" id="order-stats-row">
+    <div class="order-stat-pill pill-pending" id="stat-pill-pending" onclick="filterOrders('pending')">
+        <span class="pill-icon">⏳</span>
+        <div>
+            <span class="pill-count" id="count-pending">{{.CountPending}}</span>
+            <span class="pill-label">Menunggu</span>
+        </div>
+    </div>
+    <div class="order-stat-pill pill-processing" id="stat-pill-processing" onclick="filterOrders('processing')">
+        <span class="pill-icon">👨‍🍳</span>
+        <div>
+            <span class="pill-count" id="count-processing">{{.CountProcessing}}</span>
+            <span class="pill-label">Diproses</span>
+        </div>
+    </div>
+    <div class="order-stat-pill pill-delivery" id="stat-pill-delivery" onclick="filterOrders('delivery')">
+        <span class="pill-icon">🛵</span>
+        <div>
+            <span class="pill-count" id="count-delivery">{{.CountDelivery}}</span>
+            <span class="pill-label">Dikirim</span>
+        </div>
+    </div>
+    <div class="order-stat-pill pill-completed" id="stat-pill-completed" onclick="filterOrders('completed')">
+        <span class="pill-icon">✅</span>
+        <div>
+            <span class="pill-count" id="count-completed">{{.CountCompleted}}</span>
+            <span class="pill-label">Selesai</span>
+        </div>
+    </div>
+    <div class="order-stat-pill pill-cancelled" id="stat-pill-cancelled" onclick="filterOrders('cancelled')">
+        <span class="pill-icon">❌</span>
+        <div>
+            <span class="pill-count" id="count-cancelled">{{.CountCancelled}}</span>
+            <span class="pill-label">Dibatalkan</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="order-filter-wrap" id="order-filter-wrap">
+    <div class="status-filter-bar">
+        <button class="status-filter-btn active" data-status="" onclick="filterOrders('')" id="sf-all">🗂️ Semua</button>
+        <button class="status-filter-btn" data-status="pending" onclick="filterOrders('pending')" id="sf-pending">
+            <span class="dot dot-pending"></span> Menunggu
+        </button>
+        <button class="status-filter-btn" data-status="processing" onclick="filterOrders('processing')" id="sf-processing">
+            <span class="dot dot-processing"></span> Diproses
+        </button>
+        <button class="status-filter-btn" data-status="delivery" onclick="filterOrders('delivery')" id="sf-delivery">
+            <span class="dot dot-delivery"></span> Dikirim
+        </button>
+        <button class="status-filter-btn" data-status="completed" onclick="filterOrders('completed')" id="sf-completed">
+            <span class="dot dot-completed"></span> Selesai
+        </button>
+        <button class="status-filter-btn" data-status="cancelled" onclick="filterOrders('cancelled')" id="sf-cancelled">
+            <span class="dot dot-cancelled"></span> Dibatalkan
+        </button>
+    </div>
+</div>
+
+<!-- Orders Cards View -->
+{{if .Orders}}
+<div class="orders-cards-grid" id="orders-cards-grid">
+    {{range .Orders}}
+    <div class="order-process-card" id="ocard-{{.ID}}" data-status="{{.Status}}" data-id="{{.ID}}">
+        <!-- Card Header -->
+        <div class="ocard-header">
+            <div class="ocard-id-row">
+                <code class="ocard-id">{{.ID}}</code>
+                <span class="status-badge {{statusClass (printf "%s" .Status)}}" id="badge-{{.ID}}">
+                    {{statusLabel (printf "%s" .Status)}}
+                </span>
+            </div>
+            <span class="ocard-time">{{formatTime .CreatedAt}}</span>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="ocard-customer">
+            <div class="ocard-avatar">{{slice .CustomerName 0 1}}</div>
+            <div class="ocard-cust-info">
+                <strong>{{.CustomerName}}</strong>
+                <a href="https://wa.me/62{{.Phone}}" target="_blank" class="ocard-phone">
+                    📱 {{.Phone}}
+                </a>
+            </div>
+            <div class="ocard-payment-badge pay-{{.PaymentMethod}}">
+                {{if eq .PaymentMethod "cod"}}💵 COD
+                {{else if eq .PaymentMethod "transfer"}}🏦 Transfer
+                {{else if eq .PaymentMethod "ewallet"}}📱 E-Wallet
+                {{else}}💳 {{.PaymentMethod}}{{end}}
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div class="ocard-address">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span>{{.Address}}</span>
+        </div>
+
+        {{if .Notes}}
+        <div class="ocard-notes">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>{{.Notes}}</span>
+        </div>
+        {{end}}
+
+        <!-- Order Items -->
+        <div class="ocard-items">
+            {{range .Items}}
+            <div class="ocard-item">
+                <span class="ocard-item-name">{{.MenuName}}</span>
+                <span class="ocard-item-qty">×{{.Quantity}}</span>
+                <span class="ocard-item-price">Rp {{formatRupiah .SubTotal}}</span>
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Total -->
+        <div class="ocard-total-row">
+            <div class="ocard-total-breakdown">
+                <span>Subtotal: Rp {{formatRupiah .Total}}</span>
+                <span>+ Ongkir: Rp {{formatRupiah .DeliveryFee}}</span>
+            </div>
+            <div class="ocard-grand-total">Rp {{formatRupiah .GrandTotal}}</div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="order-progress" id="progress-{{.ID}}">
+            <div class="prog-step {{if or (eq .Status "processing") (eq .Status "delivery") (eq .Status "completed")}}done{{else if eq .Status "pending"}}active{{end}}" id="ps-pending-{{.ID}}">
+                <div class="prog-dot"></div>
+                <span>Diterima</span>
+            </div>
+            <div class="prog-line {{if or (eq .Status "delivery") (eq .Status "completed")}}done{{end}}"></div>
+            <div class="prog-step {{if or (eq .Status "delivery") (eq .Status "completed")}}done{{else if eq .Status "processing"}}active{{end}}" id="ps-processing-{{.ID}}">
+                <div class="prog-dot"></div>
+                <span>Dimasak</span>
+            </div>
+            <div class="prog-line {{if eq .Status "completed"}}done{{end}}"></div>
+            <div class="prog-step {{if eq .Status "completed"}}done{{else if eq .Status "delivery"}}active{{end}}" id="ps-delivery-{{.ID}}">
+                <div class="prog-dot"></div>
+                <span>Dikirim</span>
+            </div>
+            <div class="prog-line {{if eq .Status "completed"}}done{{end}}"></div>
+            <div class="prog-step {{if eq .Status "completed"}}done{{end}}" id="ps-completed-{{.ID}}">
+                <div class="prog-dot"></div>
+                <span>Selesai</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="ocard-actions" id="actions-{{.ID}}">
+            {{if eq .Status "pending"}}
+            <button class="ocard-btn btn-process" id="btn-proc-{{.ID}}"
+                    onclick="processOrder('{{.ID}}', 'processing')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07M4.93 4.93a10 10 0 0 0 0 14.14M8.46 8.46a5 5 0 0 0 0 7.07"></path></svg>
+                Mulai Proses
+            </button>
+            <button class="ocard-btn btn-cancel-sm" onclick="confirmCancel('{{.ID}}')">
+                Tolak
+            </button>
+            {{else if eq .Status "processing"}}
+            <button class="ocard-btn btn-deliver" id="btn-deliv-{{.ID}}"
+                    onclick="processOrder('{{.ID}}', 'delivery')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                Kirim Sekarang
+            </button>
+            <button class="ocard-btn btn-cancel-sm" onclick="confirmCancel('{{.ID}}')">
+                Batal
+            </button>
+            {{else if eq .Status "delivery"}}
+            <button class="ocard-btn btn-complete" id="btn-compl-{{.ID}}"
+                    onclick="processOrder('{{.ID}}', 'completed')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Tandai Selesai
+            </button>
+            <button class="ocard-btn btn-wa" onclick="openWA('{{.Phone}}', '{{.ID}}')">
+                📱 Hub. Pelanggan
+            </button>
+            {{else if eq .Status "completed"}}
+            <div class="ocard-done-msg">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                Pesanan berhasil diselesaikan!
+            </div>
+            {{else if eq .Status "cancelled"}}
+            <div class="ocard-cancel-msg">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                Pesanan dibatalkan
+            </div>
+            {{end}}
+        </div>
+    </div>
+    {{end}}
+</div>
+
+{{else}}
+<!-- Empty State -->
+<div class="orders-empty-state" id="orders-empty">
+    <div class="empty-state-icon">📭</div>
+    <h3>Belum Ada Pesanan</h3>
+    <p>Pesanan dari pelanggan akan muncul di sini secara otomatis</p>
+    <a href="/" target="_blank" class="btn-admin-outline" style="margin-top:16px" id="goto-site-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        Buka Website Pelanggan
+    </a>
+</div>
+{{end}}
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal-overlay" id="cancel-modal" style="display:none">
+    <div class="modal-box" id="cancel-modal-box">
+        <div class="modal-icon">⚠️</div>
+        <h3>Batalkan Pesanan?</h3>
+        <p>Yakin ingin membatalkan pesanan <strong id="cancel-order-id-display"></strong>? Pelanggan akan mendapat notifikasi.</p>
+        <div class="modal-actions">
+            <button class="btn-admin-outline" onclick="closeCancelModal()" id="cancel-modal-close">Tidak</button>
+            <button class="btn-admin-danger" onclick="doCancel()" id="cancel-modal-confirm">Ya, Batalkan</button>
+        </div>
+    </div>
+</div>
+
+<!-- Order Success Animation Overlay -->
+<div class="order-complete-overlay" id="order-complete-overlay" style="display:none">
+    <div class="order-complete-card" id="order-complete-card">
+        <div class="complete-animation">🎉</div>
+        <h3>Pesanan Selesai!</h3>
+        <p id="complete-order-msg">Pesanan berhasil diselesaikan</p>
+        <button class="btn-admin-primary" onclick="closeCompleteOverlay()" id="close-complete-btn">OK</button>
+    </div>
+</div>
+
+<style>
+/* ===== ORDER PROCESSING STYLES ===== */
+.order-live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(63,185,80,0.1);
+  border: 1px solid rgba(63,185,80,0.3);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #3FB950;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #3FB950;
+  border-radius: 50%;
+  animation: livePulse 1.5s infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(63,185,80,0.5); }
+  50% { opacity: 0.8; transform: scale(1.1); box-shadow: 0 0 0 6px rgba(63,185,80,0); }
+}
+
+/* Stats Pills */
+.order-stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.order-stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+  flex: 1;
+  min-width: 120px;
+}
+
+.order-stat-pill:hover { transform: translateY(-2px); }
+
+.pill-pending { background: rgba(210,153,34,0.1); border-color: rgba(210,153,34,0.2); }
+.pill-processing { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.2); }
+.pill-delivery { background: rgba(188,140,255,0.1); border-color: rgba(188,140,255,0.2); }
+.pill-completed { background: rgba(63,185,80,0.1); border-color: rgba(63,185,80,0.2); }
+.pill-cancelled { background: rgba(255,107,107,0.1); border-color: rgba(255,107,107,0.2); }
+
+.pill-icon { font-size: 1.4rem; }
+.pill-count { display: block; font-size: 1.4rem; font-weight: 800; line-height: 1; color: #E6EDF3; }
+.pill-label { font-size: 0.72rem; color: #8B949E; font-weight: 600; }
+
+.order-filter-wrap { margin-bottom: 20px; }
+
+/* Order Cards Grid */
+.orders-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
+}
+
+.order-process-card {
+  background: #21262D;
+  border: 1px solid rgba(240,246,252,0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.order-process-card:hover {
+  border-color: rgba(255,107,53,0.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.order-process-card[data-status="pending"] { border-left: 4px solid #D29922; }
+.order-process-card[data-status="processing"] { border-left: 4px solid #58A6FF; }
+.order-process-card[data-status="delivery"] { border-left: 4px solid #BC8CFF; }
+.order-process-card[data-status="completed"] { border-left: 4px solid #3FB950; }
+.order-process-card[data-status="cancelled"] { border-left: 4px solid #FF6B6B; opacity: 0.7; }
+
+/* Card Header */
+.ocard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(240,246,252,0.08);
+}
+
+.ocard-id-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ocard-id {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #58A6FF;
+  background: rgba(88,166,255,0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.ocard-time { font-size: 0.75rem; color: #6E7681; }
+
+/* Customer */
+.ocard-customer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(240,246,252,0.06);
+}
+
+.ocard-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B35, #FF8C5A);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.ocard-cust-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ocard-cust-info strong { font-size: 0.875rem; color: #E6EDF3; }
+
+.ocard-phone {
+  font-size: 0.78rem;
+  color: #3FB950;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.ocard-phone:hover { color: #6ee7a0; }
+
+.ocard-payment-badge {
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.pay-cod { background: rgba(63,185,80,0.15); color: #3FB950; }
+.pay-transfer { background: rgba(88,166,255,0.15); color: #58A6FF; }
+.pay-ewallet { background: rgba(188,140,255,0.15); color: #BC8CFF; }
+
+/* Address */
+.ocard-address {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  color: #8B949E;
+  border-bottom: 1px solid rgba(240,246,252,0.06);
+}
+
+.ocard-address svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: #FF6B35; }
+
+/* Notes */
+.ocard-notes {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 0.78rem;
+  color: #D29922;
+  background: rgba(210,153,34,0.05);
+  border-bottom: 1px solid rgba(240,246,252,0.06);
+}
+
+.ocard-notes svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; }
+
+/* Items */
+.ocard-items {
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid rgba(240,246,252,0.06);
+}
+
+.ocard-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.ocard-item-name { flex: 1; color: #E6EDF3; font-weight: 500; }
+.ocard-item-qty { color: #8B949E; font-weight: 600; font-size: 0.78rem; }
+.ocard-item-price { color: #FF8C5A; font-weight: 700; white-space: nowrap; }
+
+/* Total */
+.ocard-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(240,246,252,0.08);
+}
+
+.ocard-total-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.72rem;
+  color: #6E7681;
+}
+
+.ocard-grand-total {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #FF6B35;
+}
+
+/* Progress Steps */
+.order-progress {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(240,246,252,0.06);
+  gap: 0;
+}
+
+.prog-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.prog-step span {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #6E7681;
+  white-space: nowrap;
+}
+
+.prog-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #21262D;
+  border: 2px solid #30363D;
+  transition: all 0.4s ease;
+}
+
+.prog-step.active .prog-dot {
+  background: #FF6B35;
+  border-color: #FF6B35;
+  box-shadow: 0 0 0 4px rgba(255,107,53,0.2);
+  animation: progPulse 1.5s infinite;
+}
+
+@keyframes progPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255,107,53,0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(255,107,53,0); }
+}
+
+.prog-step.done .prog-dot {
+  background: #3FB950;
+  border-color: #3FB950;
+}
+
+.prog-step.active span { color: #FF6B35; font-weight: 700; }
+.prog-step.done span { color: #3FB950; }
+
+.prog-line {
+  flex: 1;
+  height: 2px;
+  background: #30363D;
+  margin: 0 4px;
+  margin-bottom: 16px;
+  border-radius: 1px;
+  transition: all 0.4s ease;
+}
+
+.prog-line.done { background: #3FB950; }
+
+/* Action Buttons */
+.ocard-actions {
+  padding: 14px 16px;
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.ocard-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex: 1;
+}
+
+.ocard-btn svg { width: 14px; height: 14px; }
+
+.btn-process {
+  background: linear-gradient(135deg, #58A6FF, #3a8fd4);
+  color: white;
+  box-shadow: 0 4px 12px rgba(88,166,255,0.3);
+}
+
+.btn-process:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+.btn-deliver {
+  background: linear-gradient(135deg, #BC8CFF, #9b6cd8);
+  color: white;
+  box-shadow: 0 4px 12px rgba(188,140,255,0.3);
+}
+
+.btn-deliver:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+.btn-complete {
+  background: linear-gradient(135deg, #3FB950, #2ea043);
+  color: white;
+  box-shadow: 0 4px 12px rgba(63,185,80,0.3);
+}
+
+.btn-complete:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+.btn-cancel-sm {
+  background: rgba(255,107,107,0.12);
+  color: #FF6B6B;
+  border: 1px solid rgba(255,107,107,0.2);
+  max-width: 70px;
+}
+
+.btn-cancel-sm:hover { background: rgba(255,107,107,0.25); }
+
+.btn-wa {
+  background: rgba(63,185,80,0.12);
+  color: #3FB950;
+  border: 1px solid rgba(63,185,80,0.2);
+}
+
+.btn-wa:hover { background: rgba(63,185,80,0.25); }
+
+.ocard-done-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(63,185,80,0.1);
+  border: 1px solid rgba(63,185,80,0.2);
+  border-radius: 10px;
+  color: #3FB950;
+  font-size: 0.82rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.ocard-done-msg svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.ocard-cancel-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(255,107,107,0.08);
+  border: 1px solid rgba(255,107,107,0.2);
+  border-radius: 10px;
+  color: #FF6B6B;
+  font-size: 0.82rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.ocard-cancel-msg svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* Empty State */
+.orders-empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: #21262D;
+  border: 1px solid rgba(240,246,252,0.1);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-state-icon { font-size: 4rem; }
+.orders-empty-state h3 { font-size: 1.2rem; font-weight: 700; color: #E6EDF3; }
+.orders-empty-state p { font-size: 0.875rem; color: #8B949E; }
+
+/* Complete Overlay */
+.order-complete-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(12px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-complete-card {
+  background: #21262D;
+  border: 1px solid rgba(63,185,80,0.4);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 0 60px rgba(63,185,80,0.2);
+  animation: completePop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes completePop {
+  from { opacity:0; transform:scale(0.7); }
+  to { opacity:1; transform:scale(1); }
+}
+
+.complete-animation {
+  font-size: 4rem;
+  animation: celebrate 0.6s ease;
+  margin-bottom: 16px;
+}
+
+@keyframes celebrate {
+  0% { transform: scale(0) rotate(-30deg); }
+  60% { transform: scale(1.3) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.order-complete-card h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #3FB950;
+  margin-bottom: 8px;
+}
+
+.order-complete-card p {
+  font-size: 0.875rem;
+  color: #8B949E;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 700px) {
+  .orders-cards-grid { grid-template-columns: 1fr; }
+  .order-stats-row { gap: 8px; }
+  .order-stat-pill { min-width: 80px; padding: 10px 12px; }
+}
+</style>
+
+<script>
+let cancelOrderId = null;
+
+// Filter by status
+function filterOrders(status) {
+    document.querySelectorAll('.status-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.status === status);
+    });
+    const cards = document.querySelectorAll('.order-process-card');
+    cards.forEach(card => {
+        const cardStatus = card.dataset.status;
+        card.style.display = (!status || cardStatus === status) ? '' : 'none';
+    });
+}
+
+// Process order - advance to next status
+async function processOrder(orderId, newStatus) {
+    const btn = document.getElementById(`btn-proc-${orderId}`) ||
+                document.getElementById(`btn-deliv-${orderId}`) ||
+                document.getElementById(`btn-compl-${orderId}`);
+
+    const origContent = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite"></span>';
+        btn.disabled = true;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('status', newStatus);
+
+        const res = await fetch(`/admin/pesanan/${orderId}/status`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            updateCardUI(orderId, newStatus);
+            updateStatCounts();
+            if (newStatus === 'completed') {
+                showCompleteOverlay(orderId);
+            } else {
+                showToast(getStatusMessage(newStatus), 'success');
+            }
+        } else {
+            showToast(data.message || 'Gagal update status', 'error');
+            if (btn) { btn.innerHTML = origContent; btn.disabled = false; }
+        }
+    } catch(e) {
+        showToast('Koneksi bermasalah', 'error');
+        if (btn) { btn.innerHTML = origContent; btn.disabled = false; }
+    }
+}
+
+function getStatusMessage(status) {
+    const msgs = {
+        processing: '👨‍🍳 Pesanan sedang diproses dapur!',
+        delivery: '🛵 Pesanan sedang dalam pengiriman!',
+        completed: '✅ Pesanan berhasil diselesaikan!',
+        cancelled: '❌ Pesanan dibatalkan'
+    };
+    return msgs[status] || 'Status diperbarui';
+}
+
+function updateCardUI(orderId, newStatus) {
+    const card = document.getElementById(`ocard-${orderId}`);
+    if (!card) return;
+
+    const prevStatus = card.dataset.status;
+    card.dataset.status = newStatus;
+
+    // Update border color
+    card.style.borderLeft = '';
+    const borderColors = {
+        pending: '#D29922', processing: '#58A6FF',
+        delivery: '#BC8CFF', completed: '#3FB950', cancelled: '#FF6B6B'
+    };
+    card.style.borderLeftColor = borderColors[newStatus] || '#30363D';
+
+    // Update badge
+    const badge = document.getElementById(`badge-${orderId}`);
+    if (badge) {
+        const labels = { pending:'Menunggu', processing:'Diproses', delivery:'Dikirim', completed:'Selesai', cancelled:'Dibatalkan' };
+        const classes = { pending:'status-pending', processing:'status-processing', delivery:'status-delivery', completed:'status-completed', cancelled:'status-cancelled' };
+        badge.textContent = labels[newStatus] || newStatus;
+        badge.className = `status-badge ${classes[newStatus] || ''}`;
+    }
+
+    // Update progress steps
+    updateProgress(orderId, newStatus);
+
+    // Update action buttons
+    updateActionButtons(orderId, newStatus);
+
+    // Update opacity for cancelled
+    if (newStatus === 'cancelled') {
+        card.style.opacity = '0.65';
+    }
+}
+
+function updateProgress(orderId, status) {
+    const steps = { pending: 0, processing: 1, delivery: 2, completed: 3 };
+    const current = steps[status] ?? -1;
+
+    const stepIds = ['pending', 'processing', 'delivery', 'completed'];
+    stepIds.forEach((s, idx) => {
+        const el = document.getElementById(`ps-${s}-${orderId}`);
+        if (!el) return;
+        el.classList.remove('active', 'done');
+        if (status === 'cancelled') return;
+        if (idx < current) el.classList.add('done');
+        else if (idx === current) el.classList.add('active');
+    });
+
+    // Update lines
+    const lines = document.querySelectorAll(`#progress-${orderId} .prog-line`);
+    lines.forEach((line, idx) => {
+        line.classList.toggle('done', idx < current && status !== 'cancelled');
+    });
+}
+
+function updateActionButtons(orderId, newStatus) {
+    const actionsDiv = document.getElementById(`actions-${orderId}`);
+    if (!actionsDiv) return;
+
+    let html = '';
+    if (newStatus === 'pending') {
+        html = `
+            <button class="ocard-btn btn-process" id="btn-proc-${orderId}" onclick="processOrder('${orderId}', 'processing')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07M4.93 4.93a10 10 0 0 0 0 14.14M8.46 8.46a5 5 0 0 0 0 7.07"></path></svg>
+                Mulai Proses
+            </button>
+            <button class="ocard-btn btn-cancel-sm" onclick="confirmCancel('${orderId}')">Tolak</button>`;
+    } else if (newStatus === 'processing') {
+        html = `
+            <button class="ocard-btn btn-deliver" id="btn-deliv-${orderId}" onclick="processOrder('${orderId}', 'delivery')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                Kirim Sekarang
+            </button>
+            <button class="ocard-btn btn-cancel-sm" onclick="confirmCancel('${orderId}')">Batal</button>`;
+    } else if (newStatus === 'delivery') {
+        html = `
+            <button class="ocard-btn btn-complete" id="btn-compl-${orderId}" onclick="processOrder('${orderId}', 'completed')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Tandai Selesai
+            </button>
+            <button class="ocard-btn btn-wa" onclick="openWA('', '${orderId}')">📱 Hub. Pelanggan</button>`;
+    } else if (newStatus === 'completed') {
+        html = `<div class="ocard-done-msg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Pesanan berhasil diselesaikan!</div>`;
+    } else if (newStatus === 'cancelled') {
+        html = `<div class="ocard-cancel-msg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            Pesanan dibatalkan</div>`;
+    }
+    actionsDiv.innerHTML = html;
+}
+
+// Update stat pill counts
+function updateStatCounts() {
+    const cards = document.querySelectorAll('.order-process-card');
+    const counts = { pending:0, processing:0, delivery:0, completed:0, cancelled:0 };
+    cards.forEach(c => {
+        const s = c.dataset.status;
+        if (counts[s] !== undefined) counts[s]++;
+    });
+    Object.entries(counts).forEach(([s, n]) => {
+        const el = document.getElementById(`count-${s}`);
+        if (el) el.textContent = n;
+    });
+}
+
+// Cancel flow
+function confirmCancel(orderId) {
+    cancelOrderId = orderId;
+    document.getElementById('cancel-order-id-display').textContent = orderId;
+    document.getElementById('cancel-modal').style.display = 'flex';
+}
+
+function closeCancelModal() {
+    document.getElementById('cancel-modal').style.display = 'none';
+    cancelOrderId = null;
+}
+
+async function doCancel() {
+    if (!cancelOrderId) return;
+    const btn = document.getElementById('cancel-modal-confirm');
+    btn.textContent = 'Membatalkan...';
+    btn.disabled = true;
+    await processOrder(cancelOrderId, 'cancelled');
+    closeCancelModal();
+    btn.textContent = 'Ya, Batalkan';
+    btn.disabled = false;
+}
+
+// WhatsApp
+function openWA(phone, orderId) {
+    const msg = encodeURIComponent(`Halo, pesanan Anda #${orderId} sedang dalam pengiriman. Terima kasih!`);
+    const num = phone ? `62${phone.replace(/^0/, '')}` : '6289668263410';
+    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+}
+
+// Complete overlay
+function showCompleteOverlay(orderId) {
+    document.getElementById('complete-order-msg').textContent = `Pesanan ${orderId} berhasil diselesaikan! 🎉`;
+    document.getElementById('order-complete-overlay').style.display = 'flex';
+}
+
+function closeCompleteOverlay() {
+    document.getElementById('order-complete-overlay').style.display = 'none';
+}
+
+// Close modal on outside click
+document.getElementById('cancel-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeCancelModal();
+});
+
+// Init counts on load
+updateStatCounts();
+</script>

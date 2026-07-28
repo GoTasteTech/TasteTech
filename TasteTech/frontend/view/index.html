@@ -1,0 +1,375 @@
+<!-- Hero Section -->
+<section class="hero" id="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-particles" id="particles"></div>
+
+    <div class="hero-container">
+        <div class="hero-content" data-aos="fade-right">
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                🔥 Pesan Sekarang, Diantar dalam 30 Menit
+            </div>
+            <h1 class="hero-title">
+                Makanan Lezat <br>
+                <span class="gradient-text">Diantar ke Pintu</span> <br>
+                Rumahmu
+            </h1>
+            <p class="hero-subtitle">
+                Ribuan pilihan menu dari dapur terbaik Cimahi. Pesan mudah, cepat, dan aman. 
+                Nikmati kelezatan tanpa harus keluar rumah! 🚀
+            </p>
+            <div class="hero-actions">
+                <a href="/menu" class="btn-primary" id="hero-order-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    Pesan Sekarang
+                </a>
+                <a href="#featured" class="btn-outline" id="hero-explore-btn">
+                    Lihat Menu
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="50000">50K+</span>
+                    <span class="stat-label">Pelanggan Puas</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Menu Tersedia</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">30 Min</span>
+                    <span class="stat-label">Estimasi Antar</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual" data-aos="fade-left">
+            <div class="hero-card main-card">
+                <div class="hero-food-emoji">🍛</div>
+                <div class="card-content">
+                    <h3>Nasi Goreng Spesial</h3>
+                    <div class="card-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="card-footer-info">
+                        <span class="card-price">Rp 32.000</span>
+                        <button class="card-order-btn" onclick="quickAddToCart(1, 'Nasi Goreng Spesial')">Tambah +</button>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-card floating-card card-1">
+                <span>🍜</span>
+                <span>Mie Ayam Bakso</span>
+                <span class="fc-price">Rp 28K</span>
+            </div>
+            <div class="hero-card floating-card card-2">
+                <span>☕</span>
+                <span>Kopi Susu Aren</span>
+                <span class="fc-price">Rp 25K</span>
+            </div>
+            <div class="hero-card floating-card card-3">
+                <span>🍰</span>
+                <span>Lava Cake</span>
+                <span class="fc-price">Rp 35K</span>
+            </div>
+            <div class="hero-glow"></div>
+        </div>
+    </div>
+
+    <div class="hero-wave">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+            <path fill="var(--bg-secondary)" d="M0,60 C480,100 960,0 1440,60 L1440,100 L0,100 Z"/>
+        </svg>
+    </div>
+</section>
+
+<!-- Kategori Section -->
+<section class="categories-section" id="kategori">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Jelajahi <span class="gradient-text">Kategori</span></h2>
+            <p class="section-subtitle">Temukan makanan favorit Anda dari berbagai kategori pilihan</p>
+        </div>
+        <div class="categories-grid">
+            {{range .Categories}}
+            <a href="/menu?kategori={{.ID}}" class="category-card" id="cat-{{.ID}}">
+                <div class="category-icon">{{.Icon}}</div>
+                <span class="category-name">{{.Name}}</span>
+                <div class="category-glow"></div>
+            </a>
+            {{end}}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Menu Section -->
+<section class="featured-section" id="featured">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-tag">✨ Pilihan Terpopuler</div>
+            <h2 class="section-title">Menu <span class="gradient-text">Terfavorit</span></h2>
+            <p class="section-subtitle">Menu dengan rating tertinggi yang paling banyak dipesan pelanggan kami</p>
+        </div>
+
+        <div class="menu-grid" id="featured-grid">
+            {{range .Featured}}
+            <div class="menu-card" id="menu-card-{{.ID}}" data-category="{{.Category}}">
+                <div class="menu-card-img">
+                    <div class="menu-emoji">
+                        {{if eq .Category "makanan"}}🍛{{else if eq .Category "minuman"}}🥤{{else if eq .Category "camilan"}}🍿{{else}}🍰{{end}}
+                    </div>
+                    <div class="menu-badge">⭐ {{.Rating}}</div>
+                    {{if eq .IsAvailable false}}
+                    <div class="menu-unavailable">Habis</div>
+                    {{end}}
+                </div>
+                <div class="menu-card-body">
+                    <div class="menu-category-tag">{{.Category}}</div>
+                    <h3 class="menu-name">{{.Name}}</h3>
+                    <p class="menu-desc">{{.Description}}</p>
+                    <div class="menu-sold">🔥 {{.Sold}} terjual</div>
+                    <div class="menu-card-footer">
+                        <span class="menu-price">Rp {{formatRupiah .Price}}</span>
+                        {{if .IsAvailable}}
+                        <button class="add-to-cart-btn" id="add-btn-{{.ID}}"
+                                onclick="addToCart({{.ID}}, '{{.Name}}')"
+                                data-menu-id="{{.ID}}"
+                                data-menu-name="{{.Name}}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Tambah
+                        </button>
+                        {{else}}
+                        <button class="add-to-cart-btn disabled" disabled>Habis</button>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+
+        <div class="section-cta">
+            <a href="/menu" class="btn-primary" id="view-all-menu-btn">
+                Lihat Semua Menu
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="howto-section" id="howto">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-tag">📱 Mudah & Cepat</div>
+            <h2 class="section-title">Cara <span class="gradient-text">Pesan</span></h2>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card" id="step-1">
+                <div class="step-number">01</div>
+                <div class="step-icon">🔍</div>
+                <h3>Pilih Menu</h3>
+                <p>Browse ribuan menu lezat dari berbagai kategori pilihan Anda</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-card" id="step-2">
+                <div class="step-number">02</div>
+                <div class="step-icon">🛒</div>
+                <h3>Tambah ke Keranjang</h3>
+                <p>Masukkan menu pilihan ke keranjang dan sesuaikan jumlahnya</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-card" id="step-3">
+                <div class="step-number">03</div>
+                <div class="step-icon">📍</div>
+                <h3>Isi Alamat</h3>
+                <p>Masukkan alamat pengiriman dan pilih metode pembayaran</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-card" id="step-4">
+                <div class="step-number">04</div>
+                <div class="step-icon">🚀</div>
+                <h3>Pesanan Dikirim</h3>
+                <p>Pesanan diproses dan dikirim ke lokasi Anda dengan cepat</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Promo Section -->
+<section class="promo-section" id="promo">
+    <div class="container">
+        <div class="promo-card" id="promo-card">
+            <div class="promo-content">
+                <div class="promo-tag">🎉 Promo Hari Ini</div>
+                <h2>Gratis Ongkir untuk <br><span class="gradient-text">Pesanan Pertamamu!</span></h2>
+                <p>Gunakan kode promo <strong>TasteTech2026</strong> dan nikmati gratis ongkos kirim untuk pesanan pertama Anda</p>
+                <div class="promo-code-box" id="promo-code-box">
+                    <span class="promo-code" id="promo-code-text">TasteTech2026</span>
+                    <button class="copy-btn" id="copy-promo-btn" onclick="copyPromoCode()">Salin Kode</button>
+                </div>
+                <a href="/menu" class="btn-primary" id="promo-order-btn">Pesan Sekarang</a>
+            </div>
+            <div class="promo-visual">
+                <div class="promo-emoji">🎁</div>
+                <div class="promo-circles">
+                    <div class="promo-circle c1"></div>
+                    <div class="promo-circle c2"></div>
+                    <div class="promo-circle c3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PRODUK TERLARIS SECTION ===== -->
+<section class="bestseller-section" id="bestseller">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-tag">🏆 Paling Laku</div>
+            <h2 class="section-title">Produk <span class="gradient-text">Terlaris</span></h2>
+            <p class="section-subtitle">Menu favorit pelanggan setia TasteTech yang paling banyak dipesan setiap harinya</p>
+        </div>
+
+        <div class="bestseller-grid" id="bestseller-grid">
+            <!-- Rank 1 - Es Kopi Susu Aren -->
+            <div class="bestseller-card" id="bs-1">
+                <div class="bestseller-rank rank-1">🥇</div>
+                <div class="bestseller-badge">7.800 terjual</div>
+                <div class="bestseller-img-area">
+                    <div class="bestseller-emoji">☕</div>
+                </div>
+                <div class="bestseller-body">
+                    <h3 class="bestseller-name">Es Kopi Susu Aren</h3>
+                    <div class="bestseller-meta">
+                        <span class="bestseller-rating">⭐ 4.9</span>
+                        <span class="bestseller-sold">🔥 7.800+ terjual</span>
+                    </div>
+                    <div class="bestseller-footer">
+                        <span class="bestseller-price">Rp 25.000</span>
+                        <button class="bestseller-btn" onclick="addToCart(13, 'Es Kopi Susu Aren')" id="bs-btn-1">+ Pesan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank 2 - Es Teh Tarik Susu -->
+            <div class="bestseller-card" id="bs-2">
+                <div class="bestseller-rank rank-2">🥈</div>
+                <div class="bestseller-badge">5.600 terjual</div>
+                <div class="bestseller-img-area">
+                    <div class="bestseller-emoji">🧋</div>
+                </div>
+                <div class="bestseller-body">
+                    <h3 class="bestseller-name">Es Teh Tarik Susu</h3>
+                    <div class="bestseller-meta">
+                        <span class="bestseller-rating">⭐ 4.8</span>
+                        <span class="bestseller-sold">🔥 5.600+ terjual</span>
+                    </div>
+                    <div class="bestseller-footer">
+                        <span class="bestseller-price">Rp 15.000</span>
+                        <button class="bestseller-btn" onclick="addToCart(11, 'Es Teh Tarik Susu')" id="bs-btn-2">+ Pesan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank 3 - Pisang Goreng Crispy -->
+            <div class="bestseller-card" id="bs-3">
+                <div class="bestseller-rank rank-3">🥉</div>
+                <div class="bestseller-badge">3.200 terjual</div>
+                <div class="bestseller-img-area">
+                    <div class="bestseller-emoji">🍌</div>
+                </div>
+                <div class="bestseller-body">
+                    <h3 class="bestseller-name">Pisang Goreng Crispy</h3>
+                    <div class="bestseller-meta">
+                        <span class="bestseller-rating">⭐ 4.7</span>
+                        <span class="bestseller-sold">🔥 3.200+ terjual</span>
+                    </div>
+                    <div class="bestseller-footer">
+                        <span class="bestseller-price">Rp 18.000</span>
+                        <button class="bestseller-btn" onclick="addToCart(7, 'Pisang Goreng Crispy')" id="bs-btn-3">+ Pesan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank 4 -->
+            <div class="bestseller-card" id="bs-4">
+                <div class="bestseller-rank" style="background:linear-gradient(135deg,#4a4a5a,#3a3a4a);color:#aaa">4</div>
+                <div class="bestseller-img-area">
+                    <div class="bestseller-emoji">🍛</div>
+                </div>
+                <div class="bestseller-body">
+                    <h3 class="bestseller-name">Nasi Goreng Spesial</h3>
+                    <div class="bestseller-meta">
+                        <span class="bestseller-rating">⭐ 4.8</span>
+                        <span class="bestseller-sold">1.240+ terjual</span>
+                    </div>
+                    <div class="bestseller-footer">
+                        <span class="bestseller-price">Rp 32.000</span>
+                        <button class="bestseller-btn" onclick="addToCart(1, 'Nasi Goreng Spesial')" id="bs-btn-4">+ Pesan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank 5 -->
+            <div class="bestseller-card" id="bs-5">
+                <div class="bestseller-rank" style="background:linear-gradient(135deg,#4a4a5a,#3a3a4a);color:#aaa">5</div>
+                <div class="bestseller-img-area">
+                    <div class="bestseller-emoji">🍰</div>
+                </div>
+                <div class="bestseller-body">
+                    <h3 class="bestseller-name">Lava Cake Coklat</h3>
+                    <div class="bestseller-meta">
+                        <span class="bestseller-rating">⭐ 4.9</span>
+                        <span class="bestseller-sold">2.100+ terjual</span>
+                    </div>
+                    <div class="bestseller-footer">
+                        <span class="bestseller-price">Rp 35.000</span>
+                        <button class="bestseller-btn" onclick="addToCart(17, 'Lava Cake Coklat')" id="bs-btn-5">+ Pesan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rank 6 -->
+            <div class="bestseller-card" id="bs-6">
+                <div class="bestseller-rank" style="background:linear-gradient(135deg,#4a4a5a,#3a3a4a);color:#aaa">6</div>
+                <div class="bestseller-img-area">
+                    <div class="bestseller-emoji">🍖</div>
+                </div>
+                <div class="bestseller-body">
+                    <h3 class="bestseller-name">Rendang Daging</h3>
+                    <div class="bestseller-meta">
+                        <span class="bestseller-rating">⭐ 5.0</span>
+                        <span class="bestseller-sold">1.890+ terjual</span>
+                    </div>
+                    <div class="bestseller-footer">
+                        <span class="bestseller-price">Rp 55.000</span>
+                        <button class="bestseller-btn" onclick="addToCart(5, 'Rendang Daging')" id="bs-btn-6">+ Pesan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center;margin-top:36px">
+            <a href="/menu" class="btn-primary" id="see-all-menu-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                Lihat Semua Menu
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+function quickAddToCart(menuId, menuName) {
+    addToCart(menuId, menuName);
+}
+
+function copyPromoCode() {
+    const code = document.getElementById('promo-code-text').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Kode promo berhasil disalin!', 'success');
+    });
+}
+</script>
+
+

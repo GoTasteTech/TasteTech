@@ -1,0 +1,422 @@
+<!-- Admin Promo Management -->
+<div class="page-top">
+    <div>
+        <h1 class="page-heading">Manajemen Promo</h1>
+        <p class="page-sub">Atur harga promo dan diskon untuk menu yang ingin dipromosikan</p>
+    </div>
+    <div class="page-actions">
+        <span class="total-badge">
+            🔥 <strong id="promo-active-count">{{.PromoCount}}</strong> menu promo aktif
+        </span>
+        <a href="/promo" target="_blank" class="btn-admin-outline" id="preview-promo-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Lihat Halaman Promo
+        </a>
+    </div>
+</div>
+
+<!-- Promo Summary Cards -->
+<div class="promo-summary-row" id="promo-summary-row">
+    <div class="promo-sum-card" style="border-top-color:#FF6B35">
+        <span class="psc-icon">🔥</span>
+        <div>
+            <span class="psc-num" id="psc-active">{{.PromoCount}}</span>
+            <span class="psc-label">Promo Aktif</span>
+        </div>
+    </div>
+    <div class="promo-sum-card" style="border-top-color:#8B949E">
+        <span class="psc-icon">📦</span>
+        <div>
+            <span class="psc-num" id="psc-total">{{len .AllMenus}}</span>
+            <span class="psc-label">Total Menu</span>
+        </div>
+    </div>
+    <div class="promo-sum-card" style="border-top-color:#3FB950">
+        <span class="psc-icon">💰</span>
+        <div>
+            <span class="psc-num">Hingga 30%</span>
+            <span class="psc-label">Diskon Terbesar</span>
+        </div>
+    </div>
+    <div class="promo-sum-card" style="border-top-color:#FFD700">
+        <span class="psc-icon">📅</span>
+        <div>
+            <span class="psc-num">Jul 2026</span>
+            <span class="psc-label">Promo Aktif s/d</span>
+        </div>
+    </div>
+</div>
+
+<!-- All Menu List with Promo Toggle -->
+<div class="admin-card" id="promo-menu-card">
+    <div class="card-header" style="padding:16px 20px;border-bottom:1px solid rgba(240,246,252,0.08)">
+        <h2 class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+            Semua Menu
+        </h2>
+        <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="promo-search" placeholder="Cari menu..." class="form-input" style="width:200px;padding:8px 14px;font-size:0.82rem" oninput="searchPromoMenu(this.value)">
+            <select id="promo-cat-filter" class="form-input" style="width:140px;padding:8px 14px;font-size:0.82rem" onchange="filterPromoCategory(this.value)">
+                <option value="">Semua Kategori</option>
+                <option value="makanan">Makanan</option>
+                <option value="camilan">Camilan</option>
+                <option value="minuman">Minuman</option>
+                <option value="dessert">Dessert</option>
+            </select>
+        </div>
+    </div>
+    <div class="card-body no-pad">
+        <div class="table-responsive">
+            <table class="admin-table" id="promo-table">
+                <thead>
+                    <tr>
+                        <th>Menu</th>
+                        <th>Kategori</th>
+                        <th>Harga Normal</th>
+                        <th>Status Promo</th>
+                        <th>Harga Promo</th>
+                        <th>Diskon</th>
+                        <th>Berakhir</th>
+                        <th width="260">Atur Promo</th>
+                    </tr>
+                </thead>
+                <tbody id="promo-tbody">
+                    {{range .AllMenus}}
+                    <tr id="pmrow-{{.ID}}" data-id="{{.ID}}" data-name="{{.Name}}" data-category="{{.Category}}" data-price="{{.Price}}" data-promo="{{.IsPromo}}">
+                        <td>
+                            <div style="display:flex;align-items:center;gap:10px">
+                                <span style="font-size:1.5rem">
+                                    {{if eq .Category "makanan"}}🍛
+                                    {{else if eq .Category "camilan"}}🍿
+                                    {{else if eq .Category "minuman"}}🥤
+                                    {{else if eq .Category "dessert"}}🍰
+                                    {{else}}🍽️{{end}}
+                                </span>
+                                <div>
+                                    <strong style="font-size:0.875rem">{{.Name}}</strong>
+                                    {{if not .IsAvailable}}<small style="color:#FF6B6B;display:block">Tidak Tersedia</small>{{end}}
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="cat-badge cat-{{.Category}}">{{.Category}}</span></td>
+                        <td class="price-cell" id="pm-orig-{{.ID}}">Rp {{formatRupiah .Price}}</td>
+                        <td>
+                            <label class="promo-toggle-switch" title="{{if .IsPromo}}Klik untuk nonaktifkan promo{{else}}Klik untuk aktifkan promo{{end}}">
+                                <input type="checkbox" id="ptoggle-{{.ID}}" {{if .IsPromo}}checked{{end}}
+                                       onchange="togglePromo({{.ID}}, this)">
+                                <span class="pts-slider"></span>
+                            </label>
+                        </td>
+                        <td class="price-cell" id="pm-promo-{{.ID}}">
+                            {{if .IsPromo}}
+                            <span style="color:#FF6B35;font-weight:700">Rp {{formatRupiah .PromoPrice}}</span>
+                            {{else}}
+                            <span style="color:#6E7681">-</span>
+                            {{end}}
+                        </td>
+                        <td id="pm-disc-{{.ID}}">
+                            {{if .IsPromo}}
+                            <span class="promo-pct-badge" id="pctbadge-{{.ID}}">-{{.PromoPercent}}%</span>
+                            {{else}}
+                            <span style="color:#6E7681" id="pctbadge-{{.ID}}">-</span>
+                            {{end}}
+                        </td>
+                        <td id="pm-end-{{.ID}}" style="font-size:0.8rem;color:{{if .IsPromo}}#D29922{{else}}#6E7681{{end}}">
+                            {{if .IsPromo}}{{.PromoEnd}}{{else}}-{{end}}
+                        </td>
+                        <td>
+                            <div class="promo-action-cell" id="paction-{{.ID}}">
+                                {{if .IsPromo}}
+                                <div class="promo-set-form" id="psetform-{{.ID}}">
+                                    <input type="number" class="form-input" id="pdisc-inp-{{.ID}}"
+                                           value="{{.PromoPercent}}" min="1" max="90"
+                                           style="width:65px;padding:6px 8px;font-size:0.8rem;text-align:center"
+                                           placeholder="%">
+                                    <span style="font-size:0.8rem;color:#8B949E">%</span>
+                                    <input type="text" class="form-input" id="pend-inp-{{.ID}}"
+                                           value="{{.PromoEnd}}" placeholder="31 Jul 2026"
+                                           style="width:105px;padding:6px 8px;font-size:0.78rem">
+                                    <button class="btn-promo-set" id="pbtn-{{.ID}}"
+                                            onclick="setPromoDetail({{.ID}})">Simpan</button>
+                                </div>
+                                {{else}}
+                                <span style="color:#6E7681;font-size:0.8rem">Aktifkan promo dulu</span>
+                                {{end}}
+                            </div>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ===== PROMO ADMIN STYLES ===== */
+.promo-summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.promo-sum-card {
+  background: #21262D;
+  border: 1px solid rgba(240,246,252,0.1);
+  border-top: 3px solid;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.psc-icon { font-size: 2rem; }
+.psc-num { display: block; font-size: 1.3rem; font-weight: 800; color: #E6EDF3; line-height: 1; }
+.psc-label { display: block; font-size: 0.75rem; color: #8B949E; margin-top: 3px; }
+
+/* Toggle Switch */
+.promo-toggle-switch {
+  position: relative;
+  display: inline-flex;
+  width: 46px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.promo-toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.pts-slider {
+  position: absolute;
+  inset: 0;
+  background: #30363D;
+  border-radius: 100px;
+  transition: all 0.3s ease;
+}
+
+.pts-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: #8B949E;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.promo-toggle-switch input:checked + .pts-slider {
+  background: rgba(255,107,53,0.3);
+  border: 1px solid rgba(255,107,53,0.5);
+}
+
+.promo-toggle-switch input:checked + .pts-slider::before {
+  transform: translateX(22px);
+  background: #FF6B35;
+  box-shadow: 0 0 8px rgba(255,107,53,0.5);
+}
+
+/* Promo Percent Badge */
+.promo-pct-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: linear-gradient(135deg, #FF6B35, #FF4500);
+  color: white;
+  border-radius: 100px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+/* Promo Set Form */
+.promo-set-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-promo-set {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #FF6B35, #FF8C5A);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-promo-set:hover { filter: brightness(1.1); }
+
+.cat-badge {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.cat-makanan { background: rgba(88,166,255,0.15); color: #58A6FF; }
+.cat-camilan { background: rgba(255,215,0,0.15); color: #FFD700; }
+.cat-minuman { background: rgba(63,185,80,0.15); color: #3FB950; }
+.cat-dessert { background: rgba(188,140,255,0.15); color: #BC8CFF; }
+
+@media (max-width: 900px) {
+  .promo-summary-row { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+
+<script>
+// Toggle promo on/off
+async function togglePromo(menuId, checkbox) {
+    const prevChecked = !checkbox.checked;
+    try {
+        const res = await fetch(`/admin/promo/${menuId}/toggle`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            updatePromoRow(menuId, data.is_promo, data.promo_price);
+            updatePromoCounts(data.is_promo);
+            showToast(data.message, 'success');
+        } else {
+            checkbox.checked = prevChecked;
+            showToast(data.message || 'Gagal update promo', 'error');
+        }
+    } catch(e) {
+        checkbox.checked = prevChecked;
+        showToast('Koneksi bermasalah', 'error');
+    }
+}
+
+// Set custom promo discount
+async function setPromoDetail(menuId) {
+    const btn = document.getElementById(`pbtn-${menuId}`);
+    const pct = document.getElementById(`pdisc-inp-${menuId}`).value;
+    const end = document.getElementById(`pend-inp-${menuId}`).value;
+
+    if (!pct || pct < 1 || pct > 90) {
+        showToast('Diskon harus antara 1-90%', 'error');
+        return;
+    }
+
+    btn.textContent = 'Menyimpan...';
+    btn.disabled = true;
+
+    const fd = new FormData();
+    fd.append('percent', pct);
+    fd.append('promo_end', end);
+
+    try {
+        const res = await fetch(`/admin/promo/${menuId}/set`, { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+            // Update display
+            const row = document.getElementById(`pmrow-${menuId}`);
+            const origPrice = parseFloat(row.dataset.price);
+            const promoPrice = origPrice * (1 - parseInt(pct) / 100);
+
+            document.getElementById(`pm-promo-${menuId}`).innerHTML =
+                `<span style="color:#FF6B35;font-weight:700">Rp ${formatRp(promoPrice)}</span>`;
+            document.getElementById(`pctbadge-${menuId}`).outerHTML =
+                `<span class="promo-pct-badge" id="pctbadge-${menuId}">-${pct}%</span>`;
+            const endEl = document.getElementById(`pm-end-${menuId}`);
+            endEl.textContent = end || '31 Jul 2026';
+            endEl.style.color = '#D29922';
+
+            showToast(`✅ Promo diskon ${pct}% berhasil disimpan!`, 'success');
+        } else {
+            showToast(data.message || 'Gagal menyimpan', 'error');
+        }
+    } catch(e) {
+        showToast('Koneksi bermasalah', 'error');
+    } finally {
+        btn.textContent = 'Simpan';
+        btn.disabled = false;
+    }
+}
+
+function updatePromoRow(menuId, isPromo, promoPrice) {
+    const row = document.getElementById(`pmrow-${menuId}`);
+    row.dataset.promo = isPromo;
+
+    const origPrice = parseFloat(row.dataset.price);
+
+    // Update promo price cell
+    const ppCell = document.getElementById(`pm-promo-${menuId}`);
+    if (isPromo && promoPrice) {
+        ppCell.innerHTML = `<span style="color:#FF6B35;font-weight:700">Rp ${formatRp(promoPrice)}</span>`;
+    } else {
+        ppCell.innerHTML = `<span style="color:#6E7681">-</span>`;
+    }
+
+    // Update badge
+    const badge = document.getElementById(`pctbadge-${menuId}`);
+    if (isPromo) {
+        badge.outerHTML = `<span class="promo-pct-badge" id="pctbadge-${menuId}">-20%</span>`;
+    } else {
+        badge.outerHTML = `<span style="color:#6E7681" id="pctbadge-${menuId}">-</span>`;
+    }
+
+    // Update end date
+    const endEl = document.getElementById(`pm-end-${menuId}`);
+    if (isPromo) {
+        endEl.textContent = '31 Jul 2026';
+        endEl.style.color = '#D29922';
+    } else {
+        endEl.textContent = '-';
+        endEl.style.color = '#6E7681';
+    }
+
+    // Update action cell
+    const actionCell = document.getElementById(`paction-${menuId}`);
+    if (isPromo) {
+        actionCell.innerHTML = `
+            <div class="promo-set-form" id="psetform-${menuId}">
+                <input type="number" class="form-input" id="pdisc-inp-${menuId}"
+                       value="20" min="1" max="90"
+                       style="width:65px;padding:6px 8px;font-size:0.8rem;text-align:center" placeholder="%">
+                <span style="font-size:0.8rem;color:#8B949E">%</span>
+                <input type="text" class="form-input" id="pend-inp-${menuId}"
+                       value="31 Jul 2026" placeholder="31 Jul 2026"
+                       style="width:105px;padding:6px 8px;font-size:0.78rem">
+                <button class="btn-promo-set" id="pbtn-${menuId}"
+                        onclick="setPromoDetail(${menuId})">Simpan</button>
+            </div>`;
+    } else {
+        actionCell.innerHTML = `<span style="color:#6E7681;font-size:0.8rem">Aktifkan promo dulu</span>`;
+    }
+}
+
+function updatePromoCounts(added) {
+    const el = document.getElementById('promo-active-count');
+    const el2 = document.getElementById('psc-active');
+    let cur = parseInt(el.textContent) || 0;
+    if (added) cur++; else cur = Math.max(0, cur - 1);
+    el.textContent = cur;
+    if (el2) el2.textContent = cur;
+}
+
+function formatRp(num) {
+    const n = Math.floor(num);
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Search
+function searchPromoMenu(q) {
+    q = q.toLowerCase();
+    document.querySelectorAll('#promo-tbody tr').forEach(row => {
+        const name = row.dataset.name.toLowerCase();
+        row.style.display = name.includes(q) ? '' : 'none';
+    });
+}
+
+// Category filter
+function filterPromoCategory(cat) {
+    document.querySelectorAll('#promo-tbody tr').forEach(row => {
+        row.style.display = (!cat || row.dataset.category === cat) ? '' : 'none';
+    });
+}
+</script>

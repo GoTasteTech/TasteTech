@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tastetech
+    runtime: go
+    buildCommand: go build -o app .
+    startCommand: ./app
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: GO_ENV
+        value: production

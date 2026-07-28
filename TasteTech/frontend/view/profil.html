@@ -1,0 +1,280 @@
+<!-- Profil User Page -->
+<section style="padding-top:90px;padding-bottom:60px;min-height:100vh;background:radial-gradient(ellipse at 10% 20%,rgba(255,107,53,0.07) 0%,transparent 55%),radial-gradient(ellipse at 85% 80%,rgba(46,204,113,0.05) 0%,transparent 55%),var(--bg-primary);">
+<div class="container" style="max-width:900px;">
+
+    {{if .Welcome}}
+    <div style="background:linear-gradient(135deg,rgba(46,204,113,0.15),rgba(0,200,80,0.08));border:1px solid rgba(46,204,113,0.3);border-radius:14px;padding:16px 22px;margin-bottom:24px;display:flex;align-items:center;gap:12px;animation:fadeInUp .5s ease;">
+        <span style="font-size:1.5rem;">🎉</span>
+        <div>
+            <div style="color:#2ECC71;font-weight:700;">Selamat datang, {{.User.Name}}!</div>
+            <div style="color:#A0A0B8;font-size:0.85rem;">Akun kamu berhasil dibuat. Mulai pesan makanan favoritmu!</div>
+        </div>
+        <a href="/menu" class="btn-primary" style="margin-left:auto;padding:8px 18px;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;white-space:nowrap;">🍽️ Pesan Sekarang</a>
+    </div>
+    {{end}}
+
+    {{if .Updated}}
+    <div style="background:rgba(0,150,255,0.08);border:1px solid rgba(0,150,255,0.25);border-radius:14px;padding:14px 20px;margin-bottom:24px;color:#00B0FF;font-weight:600;animation:fadeInUp .4s ease;">
+        ✅ Profil berhasil diperbarui!
+    </div>
+    {{end}}
+
+    <!-- Profile Header -->
+    <div style="background:linear-gradient(135deg,rgba(255,107,53,0.12),rgba(255,200,100,0.08),rgba(30,30,46,0.8));border:1px solid rgba(255,255,255,0.08);border-radius:22px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+        <!-- Avatar -->
+        <div id="user-avatar" style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FF8C5A);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;color:#FFFFFF;flex-shrink:0;box-shadow:0 0 30px rgba(255,107,53,0.4);">
+            {{slice .User.Name 0 1}}
+        </div>
+        <div style="flex:1;min-width:200px;">
+            <div style="font-size:1.5rem;font-weight:800;color:#FFFFFF;">{{.User.Name}}</div>
+            <div style="color:#A0A0B8;font-size:0.9rem;margin-top:4px;">{{.User.Email}}</div>
+            <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;">
+                <span style="background:rgba(255,255,255,0.06);color:#D1D1E0;padding:4px 12px;border-radius:20px;font-size:0.78rem;">
+                    📦 {{.TotalOrders}} Pesanan
+                </span>
+                <span style="background:rgba(255,255,255,0.06);color:#D1D1E0;padding:4px 12px;border-radius:20px;font-size:0.78rem;">
+                    📅 Bergabung {{formatTime .User.CreatedAt}}
+                </span>
+                {{if .User.Phone}}
+                <span style="background:rgba(255,255,255,0.06);color:#D1D1E0;padding:4px 12px;border-radius:20px;font-size:0.78rem;">
+                    📱 {{.User.Phone}}
+                </span>
+                {{end}}
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button onclick="toggleEditForm()" id="edit-toggle-btn"
+                class="btn-outline"
+                style="padding:10px 20px;border-radius:12px;font-weight:700;font-size:0.88rem;cursor:pointer;border:none;">
+                ✏️ Edit Profil
+            </button>
+            <a href="/keluar"
+               style="display:inline-flex;align-items:center;gap:6px;background:rgba(231,76,60,0.1);color:#E74C3C;border:1px solid rgba(231,76,60,0.25);padding:10px 16px;border-radius:12px;font-weight:700;font-size:0.88rem;text-decoration:none;transition:background .2s;"
+               onmouseover="this.style.background='rgba(231,76,60,0.2)'"
+               onmouseout="this.style.background='rgba(231,76,60,0.1)'">
+                🚪 Keluar
+            </a>
+        </div>
+    </div>
+
+    <!-- Edit Profil Form (hidden by default) -->
+    <div id="edit-form-wrap" style="display:none;background:rgba(30,30,46,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:24px 28px;margin-bottom:24px;animation:fadeInUp .3s ease;">
+        <h3 style="color:#FFFFFF;font-weight:700;margin-bottom:18px;font-size:1rem;">✏️ Edit Profil</h3>
+        <form method="POST" action="/profil/update">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                <div>
+                    <label style="display:block;font-size:0.8rem;color:#A0A0B8;margin-bottom:6px;">Nama Lengkap</label>
+                    <input type="text" name="name" value="{{.User.Name}}"
+                           style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFFFFF;font-size:0.9rem;outline:none;"
+                           onfocus="this.style.borderColor='#FF8C5A'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                </div>
+                <div>
+                    <label style="display:block;font-size:0.8rem;color:#A0A0B8;margin-bottom:6px;">No. Telepon</label>
+                    <input type="tel" name="phone" value="{{.User.Phone}}"
+                           placeholder="0812-xxxx-xxxx"
+                           style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFFFFF;font-size:0.9rem;outline:none;"
+                           onfocus="this.style.borderColor='#FF8C5A'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                </div>
+            </div>
+            <div style="margin-bottom:18px;">
+                <label style="display:block;font-size:0.8rem;color:#A0A0B8;margin-bottom:6px;">Alamat Pengiriman Default</label>
+                <textarea name="address" rows="2" placeholder="Jl. Contoh No. 1, Kota"
+                          style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#FFFFFF;font-size:0.9rem;outline:none;resize:vertical;"
+                          onfocus="this.style.borderColor='#FF8C5A'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">{{.User.Address}}</textarea>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <button type="submit" class="btn-primary" style="padding:11px 24px;border-radius:10px;font-weight:700;font-size:0.88rem;">
+                    💾 Simpan Perubahan
+                </button>
+                <button type="button" onclick="toggleEditForm()" class="btn-outline" style="padding:11px 20px;border-radius:10px;font-weight:700;font-size:0.88rem;cursor:pointer;border:none;">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── PESANAN AKTIF ── -->
+    {{if .ActiveOrders}}
+    <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <span style="font-size:1.3rem;">🔥</span>
+            <h2 style="color:#FFFFFF;font-size:1.1rem;font-weight:800;">Pesanan Aktif</h2>
+            <span style="background:rgba(255,107,53,0.2);color:#FF8C5A;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;">{{len .ActiveOrders}} pesanan</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;">
+        {{range .ActiveOrders}}
+        <div class="profil-order-card profil-order-active">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.07);">
+                <div>
+                    <div style="font-weight:800;color:#FFFFFF;font-size:1.05rem;letter-spacing:.5px;">{{.ID}}</div>
+                    <div style="font-size:0.8rem;color:#80809E;margin-top:3px;">{{formatTime .CreatedAt}}</div>
+                </div>
+                <!-- Status Badge -->
+                {{if eq .Status "pending"}}
+                <span class="order-status-badge" style="background:rgba(255,179,0,0.15);color:#FFC107;border-color:rgba(255,179,0,0.3);">🕐 Menunggu</span>
+                {{else if eq .Status "processing"}}
+                <span class="order-status-badge" style="background:rgba(0,150,255,0.15);color:#00B0FF;border-color:rgba(0,150,255,0.3);">👨‍🍳 Sedang Dimasak</span>
+                {{else if eq .Status "delivery"}}
+                <span class="order-status-badge" style="background:rgba(156,39,176,0.15);color:#E040FB;border-color:rgba(156,39,176,0.3);">🚚 Dalam Pengiriman</span>
+                {{end}}
+            </div>
+
+            <!-- Items -->
+            <div style="padding:12px 0;font-size:0.85rem;color:#A0A0B8;">
+                {{range .Items}}
+                <div style="display:inline-block;background:rgba(255,255,255,0.05);padding:3px 10px;border-radius:20px;margin:2px 4px 2px 0;font-size:0.8rem;">
+                    {{.MenuName}} ×{{.Quantity}}
+                </div>
+                {{end}}
+            </div>
+
+            <!-- Total + Tombol Lacak -->
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);">
+                <div>
+                    <div style="font-size:0.75rem;color:#80809E;">Total Pembayaran</div>
+                    <div style="font-size:1.1rem;font-weight:800;color:#FF8C5A;">Rp {{formatRupiah .GrandTotal}}</div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <a href="/lacak/{{.ID}}"
+                       style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#9C27B0,#E040FB);color:#FFFFFF;padding:10px 20px;border-radius:12px;font-weight:700;text-decoration:none;font-size:0.88rem;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 15px rgba(156,39,176,0.3);"
+                       onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(156,39,176,0.45)'"
+                       onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(156,39,176,0.3)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Lacak Pesanan
+                    </a>
+                    <a href="/pesanan/{{.ID}}" class="btn-outline" style="padding:10px 16px;border-radius:12px;font-weight:700;text-decoration:none;font-size:0.85rem;">
+                        📋 Detail
+                    </a>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        </div>
+    </div>
+    {{end}}
+
+    <!-- ── RIWAYAT SELESAI ── -->
+    <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <span style="font-size:1.3rem;">📜</span>
+            <h2 style="color:#FFFFFF;font-size:1.1rem;font-weight:800;">Riwayat Pesanan</h2>
+            {{if .CompletedOrders}}
+            <span style="background:rgba(255,255,255,0.06);color:#A0A0B8;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;">{{len .CompletedOrders}} pesanan</span>
+            {{end}}
+        </div>
+
+        {{if not .CompletedOrders}}
+        {{if not .ActiveOrders}}
+        <!-- Empty state total -->
+        <div style="text-align:center;padding:50px 20px;background:rgba(30,30,46,0.5);border:1px dashed rgba(255,255,255,0.1);border-radius:18px;">
+            <div style="font-size:3.5rem;margin-bottom:12px;">🛍️</div>
+            <h3 style="color:#FFFFFF;font-size:1.2rem;font-weight:700;margin-bottom:8px;">Belum Ada Pesanan</h3>
+            <p style="color:#A0A0B8;font-size:0.9rem;margin-bottom:20px;">Mulai pesan makanan favoritmu dan pesanan akan muncul di sini</p>
+            <a href="/menu" class="btn-primary" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:12px;font-weight:700;text-decoration:none;">
+                🍽️ Lihat Menu Sekarang
+            </a>
+        </div>
+        {{else}}
+        <div style="text-align:center;padding:30px 20px;color:#606080;font-size:0.9rem;">
+            Belum ada pesanan yang selesai
+        </div>
+        {{end}}
+        {{else}}
+        <div style="display:flex;flex-direction:column;gap:12px;">
+        {{range .CompletedOrders}}
+        <div class="profil-order-card" style="opacity:0.85;">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <div>
+                    <div style="font-weight:700;color:#D1D1E0;">{{.ID}}</div>
+                    <div style="font-size:0.78rem;color:#606080;margin-top:2px;">{{formatTime .CreatedAt}} · {{.PaymentMethod}}</div>
+                </div>
+                {{if eq .Status "completed"}}
+                <span class="order-status-badge" style="background:rgba(46,204,113,0.12);color:#2ECC71;border-color:rgba(46,204,113,0.25);">✅ Selesai</span>
+                {{else}}
+                <span class="order-status-badge" style="background:rgba(231,76,60,0.12);color:#E74C3C;border-color:rgba(231,76,60,0.25);">❌ Dibatalkan</span>
+                {{end}}
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:10px;">
+                <span style="color:#FF8C5A;font-weight:700;">Rp {{formatRupiah .GrandTotal}}</span>
+                <div style="display:flex;gap:8px;">
+                    <a href="/pesanan/{{.ID}}" class="btn-outline" style="padding:7px 14px;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;">Detail</a>
+                    <a href="/menu" class="btn-primary" style="padding:7px 14px;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.82rem;">Pesan Lagi</a>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        </div>
+        {{end}}
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px;">
+        <a href="/menu" style="display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(30,30,46,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 12px;text-decoration:none;transition:border-color .25s,background .25s;"
+           onmouseover="this.style.borderColor='rgba(255,140,90,0.3)';this.style.background='rgba(255,140,90,0.06)'"
+           onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(30,30,46,0.6)'">
+            <span style="font-size:1.8rem;">🍽️</span>
+            <span style="color:#FFFFFF;font-weight:700;font-size:0.85rem;text-align:center;">Pesan Makanan</span>
+        </a>
+        <a href="/lacak" style="display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(30,30,46,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 12px;text-decoration:none;transition:border-color .25s,background .25s;"
+           onmouseover="this.style.borderColor='rgba(156,39,176,0.3)';this.style.background='rgba(156,39,176,0.06)'"
+           onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(30,30,46,0.6)'">
+            <span style="font-size:1.8rem;">🚀</span>
+            <span style="color:#FFFFFF;font-weight:700;font-size:0.85rem;text-align:center;">Lacak Pesanan</span>
+        </a>
+        <a href="/riwayat" style="display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(30,30,46,0.6);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px 12px;text-decoration:none;transition:border-color .25s,background .25s;"
+           onmouseover="this.style.borderColor='rgba(0,150,255,0.3)';this.style.background='rgba(0,150,255,0.06)'"
+           onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(30,30,46,0.6)'">
+            <span style="font-size:1.8rem;">📜</span>
+            <span style="color:#FFFFFF;font-weight:700;font-size:0.85rem;text-align:center;">Riwayat</span>
+        </a>
+    </div>
+</div>
+</section>
+
+<style>
+.profil-order-card {
+    background: rgba(30,30,46,0.7);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 18px 22px;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.profil-order-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.15);
+}
+.profil-order-active {
+    border-color: rgba(255,107,53,0.2);
+    background: linear-gradient(135deg, rgba(255,107,53,0.05), rgba(30,30,46,0.85));
+}
+.order-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: 1px solid;
+}
+@media (max-width:600px) {
+    div[style*="grid-template-columns:repeat(3,1fr)"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
+<script>
+function toggleEditForm() {
+    const wrap = document.getElementById('edit-form-wrap');
+    const btn  = document.getElementById('edit-toggle-btn');
+    const isHidden = wrap.style.display === 'none';
+    wrap.style.display  = isHidden ? 'block' : 'none';
+    btn.textContent = isHidden ? '✕ Tutup Edit' : '✏️ Edit Profil';
+    if (isHidden) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>

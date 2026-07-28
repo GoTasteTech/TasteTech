@@ -1,0 +1,152 @@
+<!-- Order History Page -->
+<section class="order-detail-section" style="padding-top: 100px; padding-bottom: 60px;">
+    <div class="container">
+        <div class="page-header" style="text-align: center; margin-bottom: 30px;">
+            <h1 class="page-title" style="font-size: 2.2rem; font-weight: 800; color: #FFFFFF;">
+                Riwayat <span class="gradient-text">Pesanan Saya</span> 📜
+            </h1>
+            <p class="page-subtitle" style="color: #A0A0B8; max-width: 600px; margin: 10px auto 0;">
+                Pantau status dan riwayat pesanan Anda yang pernah dilakukan di TasteTech
+            </p>
+            <!-- Info box: lacak pesanan manual -->
+            <div style="max-width:600px; margin:16px auto 0; background:rgba(0,150,255,0.07); border:1px solid rgba(0,150,255,0.2); border-radius:14px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <span style="font-size:1.1rem;">🔍</span>
+                    <div style="text-align:left;">
+                        <div style="color:#00B0FF; font-weight:700; font-size:0.85rem;">Pesananmu tidak muncul di sini?</div>
+                        <div style="color:#A0A0B8; font-size:0.78rem; margin-top:2px;">Gunakan fitur lacak pesanan dengan ID pesananmu</div>
+                    </div>
+                </div>
+                <a href="/lacak" style="display:inline-flex; align-items:center; gap:6px; background:rgba(0,150,255,0.15); color:#00B0FF; border:1px solid rgba(0,150,255,0.3); padding:8px 16px; border-radius:10px; text-decoration:none; font-weight:700; font-size:0.82rem; white-space:nowrap;">
+                    🚀 Lacak Pesanan
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Bar untuk cari ID Pesanan spesifik -->
+        <div style="max-width: 600px; margin: 0 auto 35px; position: relative;">
+            <form action="/riwayat" method="GET" style="display: flex; gap: 10px;">
+                <div style="position: relative; flex: 1;">
+                    <input type="text" name="q" value="{{.SearchQuery}}"
+                           placeholder="Cari ID Pesanan (misal: GF-409001) atau nama..."
+                           style="width: 100%; padding: 14px 18px 14px 44px; background: rgba(30,30,46,0.8); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; color: #FFFFFF; font-size: 0.95rem; outline: none; transition: border-color 0.2s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #80809E;">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </div>
+                <button type="submit" class="btn-primary" style="padding: 12px 24px; border-radius: 14px; font-weight: 700; white-space: nowrap;">Cari</button>
+            </form>
+        </div>
+
+        {{if not .Orders}}
+        <!-- Empty State -->
+        <div style="text-align: center; padding: 60px 20px; background: rgba(30, 30, 46, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 20px; max-width: 600px; margin: 0 auto;">
+            <div style="font-size: 4rem; margin-bottom: 15px;">🛍️</div>
+            <h3 style="color: #FFFFFF; font-size: 1.4rem; font-weight: 700; margin-bottom: 10px;">Belum Ada Riwayat Pesanan</h3>
+            <p style="color: #A0A0B8; font-size: 0.95rem; margin-bottom: 25px;">
+                {{if .SearchQuery}}Tidak ada pesanan yang sesuai dengan kata kunci "{{.SearchQuery}}"{{else}}Anda belum pernah melakukan pemesanan di TasteTech atau cookie telah dibersihkan.{{end}}
+            </p>
+            <a href="/menu" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; border-radius: 12px; font-weight: 700; text-decoration: none;">
+                🍽️ Pesan Makanan Sekarang
+            </a>
+        </div>
+        {{else}}
+
+        <!-- Order Cards List -->
+        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 800px; margin: 0 auto;">
+            {{range .Orders}}
+            <div style="background: rgba(30, 30, 46, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 24px; transition: transform 0.2s, border-color 0.2s;">
+                <!-- Header Card: ID, Date, Status -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-weight: 800; color: #FFFFFF; font-size: 1.15rem;">{{.ID}}</span>
+                            <span style="font-size: 0.8rem; color: #A0A0B8; background: rgba(255,255,255,0.06); padding: 3px 10px; border-radius: 20px;">
+                                {{formatTime .CreatedAt}}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #80809E; margin-top: 4px;">
+                            Pemesan: <strong style="color: #D1D1E0;">{{.CustomerName}}</strong> ({{.Phone}})
+                        </div>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div>
+                        {{if eq .Status "pending"}}
+                        <span style="background: rgba(255, 179, 0, 0.15); color: #FFC107; border: 1px solid rgba(255, 179, 0, 0.3); padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            🕐 Menunggu
+                        </span>
+                        {{else if eq .Status "processing"}}
+                        <span style="background: rgba(0, 150, 255, 0.15); color: #00B0FF; border: 1px solid rgba(0, 150, 255, 0.3); padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            👨‍🍳 Sedang Dimasak
+                        </span>
+                        {{else if eq .Status "delivery"}}
+                        <span style="background: rgba(156, 39, 176, 0.15); color: #E040FB; border: 1px solid rgba(156, 39, 176, 0.3); padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            🚀 Dalam Pengiriman
+                        </span>
+                        {{else if eq .Status "completed"}}
+                        <span style="background: rgba(46, 204, 113, 0.15); color: #2ECC71; border: 1px solid rgba(46, 204, 113, 0.3); padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            ✅ Selesai
+                        </span>
+                        {{else}}
+                        <span style="background: rgba(231, 76, 60, 0.15); color: #E74C3C; border: 1px solid rgba(231, 76, 60, 0.3); padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            ❌ Dibatalkan
+                        </span>
+                        {{end}}
+                    </div>
+                </div>
+
+                <!-- Body Card: Item List -->
+                <div style="padding: 16px 0; display: flex; flex-direction: column; gap: 10px;">
+                    {{range .Items}}
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            {{if .Image}}
+                            <img src="{{.Image}}" alt="{{.MenuName}}" style="width: 42px; height: 42px; object-fit: cover; border-radius: 8px;">
+                            {{else}}
+                            <div style="width: 42px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center;">🍽️</div>
+                            {{end}}
+                            <div>
+                                <div style="font-weight: 600; color: #FFFFFF; font-size: 0.95rem;">{{.MenuName}}</div>
+                                <div style="font-size: 0.8rem; color: #A0A0B8;">{{.Quantity}}x × Rp {{formatRupiah .Price}}</div>
+                            </div>
+                        </div>
+                        <div style="font-weight: 700; color: #D1D1E0; font-size: 0.95rem;">
+                            Rp {{formatRupiah .SubTotal}}
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+
+                <!-- Footer Card: Total & Actions -->
+                <div style="padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: #80809E;">Total Pembayaran ({{.PaymentMethod}})</div>
+                        <div style="font-size: 1.2rem; font-weight: 800; color: #FF8C5A;">Rp {{formatRupiah .GrandTotal}}</div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; flex-wrap:wrap;">
+                        {{if or (eq .Status "processing") (eq .Status "delivery")}}
+                        <a href="/lacak/{{.ID}}" style="padding: 8px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-decoration: none; background:linear-gradient(135deg,#9C27B0,#E040FB); color:#FFFFFF; display:inline-flex; align-items:center; gap:6px;">
+                            🚀 Lacak Pengiriman
+                        </a>
+                        {{else if eq .Status "pending"}}
+                        <a href="/lacak/{{.ID}}" style="padding: 8px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-decoration: none; background:rgba(255,193,7,0.12); color:#FFC107; border:1px solid rgba(255,193,7,0.3); display:inline-flex; align-items:center; gap:6px;">
+                            📍 Pantau Status
+                        </a>
+                        {{end}}
+                        <a href="/pesanan/{{.ID}}" class="btn-outline" style="padding: 8px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-decoration: none;">
+                            📋 Detail
+                        </a>
+                        <a href="/menu" class="btn-primary" style="padding: 8px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-decoration: none;">
+                            🛒 Pesan Lagi
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{end}}
+    </div>
+</section>

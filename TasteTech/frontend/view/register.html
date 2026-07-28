@@ -1,0 +1,156 @@
+<!-- Register Page -->
+<section class="auth-section">
+    <div class="auth-bg-glow auth-glow-1" style="top:-10%;left:60%;background:radial-gradient(circle,rgba(46,204,113,0.15),transparent 70%);"></div>
+    <div class="auth-bg-glow auth-glow-2" style="bottom:10%;left:-5%;background:radial-gradient(circle,rgba(255,107,53,0.12),transparent 70%);"></div>
+
+    <div class="auth-container" style="max-width:540px;">
+        <!-- Brand -->
+        <a href="/" class="auth-brand">
+            <span class="logo-icon">🍽️</span>
+            <span class="logo-text">Taste<span class="logo-accent">Tech</span></span>
+        </a>
+
+        <!-- Card -->
+        <div class="auth-card">
+            {{if .Error}}
+            <div class="auth-alert auth-alert-error">
+                ❌ {{.Error}}
+            </div>
+            {{end}}
+
+            <div class="auth-header">
+                <div class="auth-icon-wrap" style="background:linear-gradient(135deg,rgba(46,204,113,0.2),rgba(0,200,100,0.1));border-color:rgba(46,204,113,0.3);">🚀</div>
+                <h1 class="auth-title">Buat Akun Baru</h1>
+                <p class="auth-subtitle">Daftar dan nikmati kemudahan memesan di TasteTech</p>
+            </div>
+
+            <form method="POST" action="/daftar" id="register-form">
+
+                <div class="auth-form-group">
+                    <label class="auth-label" for="reg-name">👤 Nama Lengkap *</label>
+                    <input
+                        type="text" id="reg-name" name="name"
+                        class="auth-input"
+                        placeholder="Masukkan nama lengkap"
+                        value="{{.Name}}"
+                        required autocomplete="name">
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-label" for="reg-email">📧 Email (Wajib @gmail.com) *</label>
+                    <input
+                        type="email" id="reg-email" name="email"
+                        class="auth-input"
+                        placeholder="nama@gmail.com"
+                        value="{{.Email}}"
+                        required autocomplete="email"
+                        pattern=".*@gmail\.com$"
+                        title="Mohon gunakan alamat @gmail.com untuk mencegah pesanan fiktif">
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-label" for="reg-password">🔒 Password *</label>
+                    <div class="auth-input-wrap">
+                        <input
+                            type="password" id="reg-password" name="password"
+                            class="auth-input"
+                            placeholder="Minimal 6 karakter"
+                            required autocomplete="new-password"
+                            oninput="checkPasswordStrength(this.value)">
+                        <button type="button" class="auth-eye-btn" onclick="togglePassword('reg-password', this)" aria-label="Tampilkan password">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                    <!-- Password Strength Bar -->
+                    <div style="margin-top:8px;">
+                        <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden;">
+                            <div id="pwd-strength-bar" style="height:100%;width:0%;border-radius:4px;transition:width .4s,background .4s;"></div>
+                        </div>
+                        <div id="pwd-strength-label" style="font-size:0.75rem;color:#80809E;margin-top:4px;"></div>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                    <div class="auth-form-group" style="margin-bottom:0;">
+                        <label class="auth-label" for="reg-phone">📱 No. Telepon</label>
+                        <input
+                            type="tel" id="reg-phone" name="phone"
+                            class="auth-input"
+                            placeholder="0812-xxxx-xxxx"
+                            value="{{.Phone}}"
+                            autocomplete="tel">
+                    </div>
+                    <div class="auth-form-group" style="margin-bottom:0;">
+                        <label class="auth-label" for="reg-address" style="white-space:nowrap;">📍 Alamat</label>
+                        <input
+                            type="text" id="reg-address" name="address"
+                            class="auth-input"
+                            placeholder="Jl. Contoh No. 1"
+                            value="{{.Address}}"
+                            autocomplete="street-address">
+                    </div>
+                </div>
+                <div style="font-size:0.75rem;color:#606080;margin-top:6px;margin-bottom:16px;">
+                    💡 Telepon dan alamat dapat diisi nanti di halaman profil
+                </div>
+
+                <button type="submit" class="auth-submit-btn btn-primary" id="register-submit"
+                        style="background:linear-gradient(135deg,#2ECC71,#27AE60);">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                    Buat Akun Sekarang
+                </button>
+
+                <p style="font-size:0.75rem;color:#606080;text-align:center;margin-top:14px;line-height:1.5;">
+                    Dengan mendaftar, kamu menyetujui syarat dan ketentuan TasteTech
+                </p>
+            </form>
+
+            <div class="auth-divider"><span>sudah punya akun?</span></div>
+
+            <div class="auth-switch">
+                <a href="/login" class="auth-switch-link">Masuk ke Akun Saya →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    btn.querySelector('.eye-icon').style.opacity = isText ? '1' : '0.4';
+}
+
+function checkPasswordStrength(val) {
+    const bar   = document.getElementById('pwd-strength-bar');
+    const label = document.getElementById('pwd-strength-label');
+    if (!bar || !val) { bar.style.width = '0%'; label.textContent = ''; return; }
+
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+        { w:'20%', color:'#E74C3C', text:'Sangat Lemah' },
+        { w:'40%', color:'#E67E22', text:'Lemah' },
+        { w:'60%', color:'#F1C40F', text:'Cukup' },
+        { w:'80%', color:'#2ECC71', text:'Kuat' },
+        { w:'100%',color:'#27AE60', text:'Sangat Kuat 💪' },
+    ];
+    const l = levels[Math.min(score, levels.length) - 1] || levels[0];
+    bar.style.width    = l.w;
+    bar.style.background = l.color;
+    label.textContent  = l.text;
+    label.style.color  = l.color;
+}
+
+document.getElementById('register-form')?.addEventListener('submit', function() {
+    const btn = document.getElementById('register-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span style="animation:spin .8s linear infinite;display:inline-block">⏳</span> Mendaftarkan...';
+});
+</script>

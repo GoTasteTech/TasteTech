@@ -1,0 +1,633 @@
+<!-- Halaman Promo -->
+<section class="promo-page-section">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="promo-page-header">
+            <div class="promo-fire-badge">
+                <span>🔥</span> Flash Sale Aktif
+            </div>
+            <h1 class="promo-page-title">
+                Promo <span class="gradient-text">Spesial</span> Hari Ini
+            </h1>
+            <p class="promo-page-subtitle">
+                Harga terbaik untuk menu favoritmu! Jangan sampai kehabisan — stok terbatas 🚀
+            </p>
+
+            <!-- Countdown Banner -->
+            <div class="promo-countdown-bar" id="promo-countdown-bar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>Promo berlangsung s/d akhir bulan Juli 2026</span>
+                <span class="countdown-pills">
+                    <span class="cpill" id="cp-d">--</span><span class="cpill-sep">:</span>
+                    <span class="cpill" id="cp-h">--</span><span class="cpill-sep">:</span>
+                    <span class="cpill" id="cp-m">--</span><span class="cpill-sep">:</span>
+                    <span class="cpill" id="cp-s">--</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="promo-stats-bar" id="promo-stats-bar">
+            <div class="psb-item">
+                <span class="psb-num">{{len .PromoMenus}}</span>
+                <span class="psb-label">Menu Promo</span>
+            </div>
+            <div class="psb-divider"></div>
+            <div class="psb-item">
+                <span class="psb-num">Hingga 30%</span>
+                <span class="psb-label">Diskon Terbesar</span>
+            </div>
+            <div class="psb-divider"></div>
+            <div class="psb-item">
+                <span class="psb-num">Gratis</span>
+                <span class="psb-label">Ongkir Min. 2 Item</span>
+            </div>
+            <div class="psb-divider"></div>
+            <div class="psb-item">
+                <span class="psb-num">30 Min</span>
+                <span class="psb-label">Estimasi Antar</span>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="promo-filter-row" id="promo-filter-row">
+            <button class="pf-btn active" onclick="filterPromo('semua', this)" id="pf-semua">🍽️ Semua</button>
+            <button class="pf-btn" onclick="filterPromo('makanan', this)" id="pf-makanan">🍛 Makanan</button>
+            <button class="pf-btn" onclick="filterPromo('camilan', this)" id="pf-camilan">🍿 Camilan</button>
+            <button class="pf-btn" onclick="filterPromo('minuman', this)" id="pf-minuman">🥤 Minuman</button>
+            <button class="pf-btn" onclick="filterPromo('dessert', this)" id="pf-dessert">🍰 Dessert</button>
+        </div>
+
+        <!-- Promo Grid -->
+        {{if .PromoMenus}}
+        <div class="promo-cards-grid" id="promo-cards-grid">
+            {{range .PromoMenus}}
+            <div class="promo-menu-card" id="pcard-{{.ID}}" data-category="{{.Category}}">
+
+                <!-- Discount Badge -->
+                <div class="promo-discount-badge" id="pdisc-{{.ID}}">
+                    -{{.PromoPercent}}%
+                </div>
+
+                <!-- End Date Badge -->
+                <div class="promo-end-badge" id="pend-{{.ID}}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    s/d {{.PromoEnd}}
+                </div>
+
+                <!-- Image Area -->
+                <div class="pcard-img-area">
+                    <div class="pcard-emoji">
+                        {{if eq .Category "makanan"}}🍛
+                        {{else if eq .Category "camilan"}}🍿
+                        {{else if eq .Category "minuman"}}🥤
+                        {{else if eq .Category "dessert"}}🍰
+                        {{else}}🍽️{{end}}
+                    </div>
+                    <!-- Promo Label Tag -->
+                    <div class="pcard-label-tag">{{.PromoLabel}}</div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="pcard-body">
+                    <div class="pcard-cat">{{.Category}}</div>
+                    <h3 class="pcard-name" id="pname-{{.ID}}">{{.Name}}</h3>
+                    <p class="pcard-desc">{{.Description}}</p>
+
+                    <!-- Rating -->
+                    <div class="pcard-rating">
+                        <span class="pcard-stars">⭐ {{.Rating}}</span>
+                        <span class="pcard-sold">{{.Sold}}+ terjual</span>
+                    </div>
+
+                    <!-- Price Section -->
+                    <div class="pcard-price-section">
+                        <div class="pcard-prices">
+                            <span class="pcard-original-price">Rp {{formatRupiah .Price}}</span>
+                            <span class="pcard-promo-price" id="pprice-{{.ID}}">Rp {{formatRupiah .PromoPrice}}</span>
+                        </div>
+                        <div class="pcard-saving">
+                            Hemat Rp {{formatRupiah (subFloat .Price .PromoPrice)}}
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button class="pcard-order-btn" id="porder-{{.ID}}"
+                            onclick="addPromoToCart({{.ID}}, '{{.Name}}', {{.PromoPrice}}, this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        Tambah ke Keranjang
+                    </button>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="promo-empty" id="promo-empty">
+            <div class="promo-empty-icon">🏷️</div>
+            <h3>Belum Ada Promo Aktif</h3>
+            <p>Pantau terus halaman ini untuk penawaran terbaik dari TasteTech!</p>
+            <a href="/menu" class="btn-primary" id="promo-go-menu">Lihat Semua Menu</a>
+        </div>
+        {{end}}
+
+        <!-- CTA Bottom -->
+        {{if .PromoMenus}}
+        <div class="promo-page-cta" id="promo-cta">
+            <div class="promo-cta-content">
+                <h3>Jangan Lewatkan Promo Lainnya!</h3>
+                <p>Lihat semua menu kami dan dapatkan pengalaman kuliner terbaik dari Cimahi</p>
+                <div class="promo-cta-btns">
+                    <a href="/menu" class="btn-primary" id="cta-see-menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line></svg>
+                        Semua Menu
+                    </a>
+                    <a href="/keranjang" class="btn-outline" id="cta-cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        Keranjang
+                    </a>
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</section>
+
+<style>
+/* ===== PROMO PAGE STYLES ===== */
+.promo-page-section {
+  padding: 120px 0 80px;
+  background: linear-gradient(180deg, #0A0A0F 0%, #12121A 100%);
+  min-height: 100vh;
+}
+
+.promo-page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.promo-fire-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,69,0,0.1));
+  border: 1px solid rgba(255,107,53,0.4);
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #FF8C5A;
+  margin-bottom: 20px;
+  animation: promoPulse 2s infinite;
+}
+
+@keyframes promoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,53,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(255,107,53,0); }
+}
+
+.promo-page-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  line-height: 1.15;
+}
+
+.promo-page-subtitle {
+  font-size: 1.1rem;
+  color: #A0A0B8;
+  max-width: 500px;
+  margin: 0 auto 28px;
+}
+
+/* Countdown */
+.promo-countdown-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #FFD700;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.promo-countdown-bar svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.countdown-pills { display: flex; align-items: center; gap: 4px; }
+.cpill {
+  background: rgba(255,215,0,0.2);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  min-width: 36px;
+  text-align: center;
+}
+.cpill-sep { font-weight: 800; font-size: 1rem; }
+
+/* Stats Bar */
+.promo-stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: #1A1A26;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.psb-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 32px;
+}
+
+.psb-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #FF6B35;
+}
+
+.psb-label {
+  font-size: 0.78rem;
+  color: #606080;
+  font-weight: 500;
+}
+
+.psb-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.08);
+}
+
+/* Filter */
+.promo-filter-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.pf-btn {
+  padding: 9px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px;
+  color: #A0A0B8;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.pf-btn:hover {
+  background: rgba(255,107,53,0.1);
+  border-color: rgba(255,107,53,0.4);
+  color: #FF8C5A;
+}
+
+.pf-btn.active {
+  background: rgba(255,107,53,0.15);
+  border-color: #FF6B35;
+  color: #FF6B35;
+}
+
+/* Promo Cards Grid */
+.promo-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.promo-menu-card {
+  position: relative;
+  background: linear-gradient(145deg, #1A1A26, #212133);
+  border: 1px solid rgba(255,107,53,0.2);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.promo-menu-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255,107,53,0.5);
+  box-shadow: 0 20px 40px rgba(255,107,53,0.15), 0 0 0 1px rgba(255,107,53,0.1);
+}
+
+/* Discount Badge */
+.promo-discount-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  background: linear-gradient(135deg, #FF6B35, #FF4500);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 100px;
+  box-shadow: 0 4px 12px rgba(255,107,53,0.5);
+  animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* End Badge */
+.promo-end-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  color: #FFD700;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,215,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.promo-end-badge svg { width: 11px; height: 11px; }
+
+/* Image Area */
+.pcard-img-area {
+  height: 160px;
+  background: linear-gradient(145deg, rgba(255,107,53,0.18), rgba(255,107,53,0.06));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pcard-emoji {
+  font-size: 5rem;
+  line-height: 1;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+  transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.promo-menu-card:hover .pcard-emoji {
+  transform: scale(1.15) rotate(-8deg);
+}
+
+.pcard-label-tag {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #333;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 100px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+/* Card Body */
+.pcard-body { padding: 18px; }
+
+.pcard-cat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #FF6B35;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.pcard-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #F0F0F8;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.pcard-desc {
+  font-size: 0.8rem;
+  color: #606080;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pcard-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.pcard-stars { font-size: 0.82rem; color: #FFD700; font-weight: 600; }
+.pcard-sold { font-size: 0.75rem; color: #606080; }
+
+/* Price Section */
+.pcard-price-section {
+  background: rgba(255,107,53,0.06);
+  border: 1px solid rgba(255,107,53,0.15);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.pcard-prices {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.pcard-original-price {
+  font-size: 0.82rem;
+  color: #606080;
+  text-decoration: line-through;
+}
+
+.pcard-promo-price {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #FF6B35;
+}
+
+.pcard-saving {
+  font-size: 0.75rem;
+  color: #3FB950;
+  font-weight: 600;
+}
+
+/* Order Button */
+.pcard-order-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #FF6B35, #FF8C5A);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(255,107,53,0.35);
+}
+
+.pcard-order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255,107,53,0.5);
+  filter: brightness(1.05);
+}
+
+.pcard-order-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.pcard-order-btn svg { width: 18px; height: 18px; }
+
+/* Empty */
+.promo-empty {
+  text-align: center;
+  padding: 80px 20px;
+  background: #1A1A26;
+  border: 1px dashed rgba(255,107,53,0.3);
+  border-radius: 20px;
+  margin-bottom: 40px;
+}
+
+.promo-empty-icon { font-size: 4rem; margin-bottom: 16px; }
+.promo-empty h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.promo-empty p { color: #A0A0B8; margin-bottom: 24px; }
+
+/* CTA */
+.promo-page-cta {
+  background: linear-gradient(135deg, rgba(255,107,53,0.12), rgba(255,107,53,0.05));
+  border: 1px solid rgba(255,107,53,0.2);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+}
+
+.promo-page-cta h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+.promo-page-cta p { color: #A0A0B8; margin-bottom: 24px; }
+.promo-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+@media (max-width: 700px) {
+  .psb-item { padding: 0 16px; }
+  .promo-cards-grid { grid-template-columns: 1fr; }
+  .promo-countdown-bar { flex-direction: column; text-align: center; }
+}
+</style>
+
+<script>
+// Filter promo by category
+function filterPromo(cat, btn) {
+    document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.promo-menu-card').forEach(card => {
+        if (cat === 'semua' || card.dataset.category === cat) {
+            card.style.display = '';
+            card.style.animation = 'fadeIn 0.3s ease';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Add promo item to cart
+async function addPromoToCart(menuId, menuName, promoPrice, btn) {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite"></span> Menambahkan...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ menu_id: menuId, quantity: 1 })
+        });
+        const data = await res.json();
+        if (data.success) {
+            // Update cart count
+            const cc = document.getElementById('cart-count');
+            if (cc) { cc.textContent = data.cart_count; cc.classList.add('bounce'); setTimeout(() => cc.classList.remove('bounce'), 500); }
+            // Show feedback on button
+            btn.innerHTML = '✅ Ditambahkan!';
+            btn.style.background = 'linear-gradient(135deg, #3FB950, #2ea043)';
+            setTimeout(() => {
+                btn.innerHTML = orig;
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 2000);
+            showToast(`🔥 ${menuName} (harga promo) ditambahkan!`, 'success');
+        } else {
+            showToast(data.message || 'Gagal menambahkan', 'error');
+            btn.innerHTML = orig;
+            btn.disabled = false;
+        }
+    } catch(e) {
+        showToast('Koneksi bermasalah', 'error');
+        btn.innerHTML = orig;
+        btn.disabled = false;
+    }
+}
+
+// Countdown timer
+function startCountdown() {
+    // Target: akhir Juli 2026
+    const target = new Date('2026-07-31T23:59:59');
+    function tick() {
+        const now = new Date();
+        const diff = target - now;
+        if (diff <= 0) {
+            document.getElementById('cp-d').textContent = '00';
+            document.getElementById('cp-h').textContent = '00';
+            document.getElementById('cp-m').textContent = '00';
+            document.getElementById('cp-s').textContent = '00';
+            return;
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const pad = n => String(n).padStart(2, '0');
+        document.getElementById('cp-d').textContent = pad(d);
+        document.getElementById('cp-h').textContent = pad(h);
+        document.getElementById('cp-m').textContent = pad(m);
+        document.getElementById('cp-s').textContent = pad(s);
+    }
+    tick();
+    setInterval(tick, 1000);
+}
+
+startCountdown();
+</script>

@@ -1,0 +1,568 @@
+<!-- Admin Dashboard -->
+<div class="page-top">
+    <div>
+        <h1 class="page-heading">Dashboard</h1>
+        <p class="page-sub">Selamat datang kembali, <strong>{{.AdminName}}</strong> 👋</p>
+    </div>
+    <div class="page-actions">
+        <div class="dash-live-badge">
+            <span class="live-dot-dash"></span>
+            <span id="header-time-dash"></span>
+        </div>
+        <a href="/admin/menu/tambah" class="btn-admin-primary" id="dash-add-menu">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Tambah Menu
+        </a>
+    </div>
+</div>
+
+<!-- ===== TOP STATS CARDS ===== -->
+<div class="stats-grid" id="stats-grid">
+    <div class="stat-card" id="stat-total-menu">
+        <div class="stat-icon icon-blue">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value">{{.TotalMenu}}</span>
+            <span class="stat-label">Total Menu</span>
+            <span class="stat-sub">{{.AvailMenu}} tersedia aktif</span>
+        </div>
+    </div>
+
+    <div class="stat-card" id="stat-total-orders">
+        <div class="stat-icon icon-orange">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value">{{.TotalOrders}}</span>
+            <span class="stat-label">Total Pesanan</span>
+            <span class="stat-sub">{{.TotalOrdersCompleted}} selesai</span>
+        </div>
+    </div>
+
+    <div class="stat-card" id="stat-total-sold">
+        <div class="stat-icon icon-green">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value">{{.TotalSold}}</span>
+            <span class="stat-label">Total Terjual</span>
+            <span class="stat-sub">Item dari semua menu</span>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card-glow" id="stat-revenue">
+        <div class="stat-icon icon-gold">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value" style="font-size:1.1rem">Rp {{formatRupiah .TotalRevenue}}</span>
+            <span class="stat-label">Total Pendapatan</span>
+            <span class="stat-sub" style="color:#3FB950">Dari pesanan selesai</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FINANCE SECTION ===== -->
+<div class="finance-section" id="finance-section">
+    <div class="section-title-bar">
+        <div class="section-title-left">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            Ringkasan Keuangan
+        </div>
+        <span class="finance-note">*Pengeluaran estimasi 40% dari pendapatan</span>
+    </div>
+
+    <div class="finance-grid" id="finance-grid">
+
+        <!-- Pendapatan Kotor -->
+        <div class="finance-card fc-income" id="fc-income">
+            <div class="fc-header">
+                <div class="fc-icon-wrap" style="background:rgba(63,185,80,0.15)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#3FB950" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                </div>
+                <div class="fc-trend fc-trend-up">↑ Masuk</div>
+            </div>
+            <div class="fc-amount">Rp {{formatRupiah .TotalRevenue}}</div>
+            <div class="fc-label">Total Pendapatan Kotor</div>
+            <div class="fc-breakdown">
+                <div class="fc-bd-row">
+                    <span>Dari pesanan</span>
+                    <span>Rp {{formatRupiah .TotalRevenue}}</span>
+                </div>
+                <div class="fc-bd-row">
+                    <span>Ongkos kirim</span>
+                    <span>Rp {{formatRupiah .TotalDeliveryFee}}</span>
+                </div>
+                <div class="fc-bd-row">
+                    <span>Pending (proses)</span>
+                    <span style="color:#D29922">Rp {{formatRupiah .PendingRevenue}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pengeluaran -->
+        <div class="finance-card fc-expense" id="fc-expense">
+            <div class="fc-header">
+                <div class="fc-icon-wrap" style="background:rgba(255,107,107,0.15)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
+                </div>
+                <div class="fc-trend fc-trend-down">↓ Keluar</div>
+            </div>
+            <div class="fc-amount" style="color:#FF6B6B">Rp {{formatRupiah .TotalExpense}}</div>
+            <div class="fc-label">Estimasi Pengeluaran</div>
+            <div class="fc-breakdown">
+                <div class="fc-bd-row">
+                    <span>Bahan baku (25%)</span>
+                    <span>Rp {{formatRupiah (multiplyFloat .TotalRevenue 0.25)}}</span>
+                </div>
+                <div class="fc-bd-row">
+                    <span>Operasional (10%)</span>
+                    <span>Rp {{formatRupiah (multiplyFloat .TotalRevenue 0.10)}}</span>
+                </div>
+                <div class="fc-bd-row">
+                    <span>Lain-lain (5%)</span>
+                    <span>Rp {{formatRupiah (multiplyFloat .TotalRevenue 0.05)}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keuntungan Bersih -->
+        <div class="finance-card fc-profit" id="fc-profit">
+            <div class="fc-header">
+                <div class="fc-icon-wrap" style="background:rgba(255,215,0,0.15)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <div class="fc-trend" style="background:rgba(255,215,0,0.15);color:#FFD700">★ Profit</div>
+            </div>
+            <div class="fc-amount" style="color:#FFD700">Rp {{formatRupiah .TotalProfit}}</div>
+            <div class="fc-label">Keuntungan Bersih</div>
+            <div class="fc-profit-bar-wrap">
+                <div class="fc-profit-label-row">
+                    <span>Margin Keuntungan</span>
+                    <span style="color:#FFD700;font-weight:700">60%</span>
+                </div>
+                <div class="fc-profit-bar">
+                    <div class="fc-profit-fill" style="width:60%"></div>
+                </div>
+            </div>
+            <div class="fc-breakdown" style="margin-top:10px">
+                <div class="fc-bd-row">
+                    <span>Pesanan selesai</span>
+                    <span style="color:#3FB950">{{.CountCompleted}} pesanan</span>
+                </div>
+                <div class="fc-bd-row">
+                    <span>Avg per pesanan</span>
+                    {{if gt .TotalOrdersCompleted 0}}
+                    <span style="color:#FFD700">Rp {{formatRupiah (divideFloat .TotalRevenue (toFloat .TotalOrdersCompleted))}}</span>
+                    {{else}}
+                    <span>-</span>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Pesanan Summary -->
+        <div class="finance-card fc-status" id="fc-status">
+            <div class="fc-header">
+                <div class="fc-icon-wrap" style="background:rgba(88,166,255,0.15)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#58A6FF" stroke-width="2"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg>
+                </div>
+                <span style="font-size:0.8rem;color:#8B949E;font-weight:600">Hari ini</span>
+            </div>
+            <div class="fc-amount" style="font-size:1.4rem">{{.TotalOrders}}</div>
+            <div class="fc-label">Total Pesanan Semua Status</div>
+            <div class="order-status-mini-list">
+                <div class="osm-item">
+                    <span class="osm-dot" style="background:#D29922"></span>
+                    <span>Menunggu</span>
+                    <span class="osm-count">{{.CountPending}}</span>
+                </div>
+                <div class="osm-item">
+                    <span class="osm-dot" style="background:#58A6FF"></span>
+                    <span>Diproses</span>
+                    <span class="osm-count">{{.CountProcessing}}</span>
+                </div>
+                <div class="osm-item">
+                    <span class="osm-dot" style="background:#BC8CFF"></span>
+                    <span>Dikirim</span>
+                    <span class="osm-count">{{.CountDelivery}}</span>
+                </div>
+                <div class="osm-item">
+                    <span class="osm-dot" style="background:#3FB950"></span>
+                    <span>Selesai</span>
+                    <span class="osm-count" style="color:#3FB950">{{.CountCompleted}}</span>
+                </div>
+                <div class="osm-item">
+                    <span class="osm-dot" style="background:#FF6B6B"></span>
+                    <span>Dibatalkan</span>
+                    <span class="osm-count" style="color:#FF6B6B">{{.CountCancelled}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN CONTENT GRID ===== -->
+<div class="dashboard-grid" id="dashboard-grid">
+    <!-- Recent Orders -->
+    <div class="dashboard-card" id="recent-orders-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                Pesanan Terbaru
+            </h2>
+            <a href="/admin/pesanan" class="card-action" id="view-all-orders">Lihat Semua →</a>
+        </div>
+        <div class="card-body">
+            {{if .RecentOrders}}
+            <div class="orders-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Pelanggan</th>
+                            <th>Pembayaran</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Waktu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .RecentOrders}}
+                        <tr>
+                            <td><code class="order-code">{{.ID}}</code></td>
+                            <td>
+                                <div style="display:flex;flex-direction:column;gap:1px">
+                                    <strong style="font-size:0.82rem">{{.CustomerName}}</strong>
+                                    <small style="color:#6E7681">{{.Phone}}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="payment-cell-dash pay-{{.PaymentMethod}}">
+                                    {{if eq .PaymentMethod "cod"}}💵 COD
+                                    {{else if eq .PaymentMethod "transfer"}}🏦 Transfer
+                                    {{else if eq .PaymentMethod "ewallet"}}📱 E-Wallet
+                                    {{else}}{{.PaymentMethod}}{{end}}
+                                </span>
+                            </td>
+                            <td class="price-cell">Rp {{formatRupiah .GrandTotal}}</td>
+                            <td><span class="status-badge {{statusClass (printf "%s" .Status)}}">{{statusLabel (printf "%s" .Status)}}</span></td>
+                            <td class="time-cell">{{formatTime .CreatedAt}}</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+            {{else}}
+            <div class="empty-table">
+                <span>📭</span>
+                <p>Belum ada pesanan masuk</p>
+                <small>Pesanan pelanggan akan muncul di sini</small>
+            </div>
+            {{end}}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="dashboard-card" id="quick-actions-card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Aksi Cepat
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="quick-actions">
+                <a href="/admin/pesanan" class="quick-action-btn" id="qa-pending">
+                    <div class="qa-icon" style="background:rgba(210,153,34,0.15);color:#D29922">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <div style="flex:1">
+                        <span>Pesanan Menunggu</span>
+                        {{if gt .CountPending 0}}
+                        <small style="display:block;color:#D29922;font-size:0.75rem;font-weight:700">{{.CountPending}} pesanan baru!</small>
+                        {{end}}
+                    </div>
+                    <svg class="qa-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/admin/menu/tambah" class="quick-action-btn" id="qa-add-menu">
+                    <div class="qa-icon" style="background:rgba(255,107,53,0.15);color:#FF6B35">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    </div>
+                    <span>Tambah Menu Baru</span>
+                    <svg class="qa-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/admin/menu" class="quick-action-btn" id="qa-menu-list">
+                    <div class="qa-icon" style="background:rgba(88,166,255,0.15);color:#58A6FF">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    </div>
+                    <span>Kelola Menu</span>
+                    <svg class="qa-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="https://wa.me/6289668263410" target="_blank" class="quick-action-btn" id="qa-wa">
+                    <div class="qa-icon" style="background:rgba(63,185,80,0.15);color:#3FB950">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    </div>
+                    <span>Hubungi Pelanggan</span>
+                    <svg class="qa-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+                <a href="/" target="_blank" class="quick-action-btn" id="qa-visit-site">
+                    <div class="qa-icon" style="background:rgba(188,140,255,0.15);color:#BC8CFF">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    </div>
+                    <span>Buka Website</span>
+                    <svg class="qa-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ===== DASHBOARD EXTRA STYLES ===== */
+.dash-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(63,185,80,0.08);
+  border: 1px solid rgba(63,185,80,0.2);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  color: #8B949E;
+}
+
+.live-dot-dash {
+  width: 8px;
+  height: 8px;
+  background: #3FB950;
+  border-radius: 50%;
+  animation: liveDash 2s infinite;
+}
+
+@keyframes liveDash {
+  0%, 100% { opacity:1; box-shadow: 0 0 0 0 rgba(63,185,80,0.5); }
+  50% { opacity:0.7; box-shadow: 0 0 0 5px rgba(63,185,80,0); }
+}
+
+.stat-card-glow {
+  border-color: rgba(63,185,80,0.2) !important;
+  background: linear-gradient(135deg, #21262D, #1a2820) !important;
+}
+
+.icon-gold {
+  background: rgba(255,215,0,0.15);
+  color: #FFD700;
+}
+
+/* ===== FINANCE SECTION ===== */
+.finance-section {
+  margin-bottom: 28px;
+}
+
+.section-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.section-title-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #E6EDF3;
+}
+
+.section-title-left svg { width: 18px; height: 18px; color: #FF6B35; }
+
+.finance-note {
+  font-size: 0.75rem;
+  color: #6E7681;
+  font-style: italic;
+}
+
+.finance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.finance-card {
+  background: #21262D;
+  border: 1px solid rgba(240,246,252,0.1);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.25s ease;
+}
+
+.finance-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.fc-income { border-top: 3px solid #3FB950; }
+.fc-expense { border-top: 3px solid #FF6B6B; }
+.fc-profit { border-top: 3px solid #FFD700; }
+.fc-status { border-top: 3px solid #58A6FF; }
+
+.fc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.fc-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fc-icon-wrap svg { width: 18px; height: 18px; }
+
+.fc-trend {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.fc-trend-up { background: rgba(63,185,80,0.15); color: #3FB950; }
+.fc-trend-down { background: rgba(255,107,107,0.15); color: #FF6B6B; }
+
+.fc-amount {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #E6EDF3;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.fc-label {
+  font-size: 0.78rem;
+  color: #8B949E;
+  margin-bottom: 14px;
+}
+
+.fc-breakdown {
+  border-top: 1px solid rgba(240,246,252,0.08);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fc-bd-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6E7681;
+}
+
+.fc-bd-row span:last-child { color: #8B949E; font-weight: 600; }
+
+/* Profit bar */
+.fc-profit-bar-wrap { margin-bottom: 4px; }
+.fc-profit-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #6E7681;
+  margin-bottom: 6px;
+}
+
+.fc-profit-bar {
+  height: 6px;
+  background: rgba(240,246,252,0.08);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.fc-profit-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  border-radius: 100px;
+  animation: fillBar 1.5s ease;
+}
+
+@keyframes fillBar {
+  from { width: 0; }
+}
+
+/* Status mini list */
+.order-status-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid rgba(240,246,252,0.08);
+  padding-top: 12px;
+}
+
+.osm-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #8B949E;
+}
+
+.osm-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.osm-count {
+  margin-left: auto;
+  font-weight: 700;
+  color: #E6EDF3;
+  font-size: 0.82rem;
+}
+
+/* Payment badge in table */
+.payment-cell-dash {
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.pay-cod { background: rgba(63,185,80,0.12); color: #3FB950; }
+.pay-transfer { background: rgba(88,166,255,0.12); color: #58A6FF; }
+.pay-ewallet { background: rgba(188,140,255,0.12); color: #BC8CFF; }
+
+@media (max-width: 1200px) {
+  .finance-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .finance-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+
+<script>
+// Live clock in dashboard header
+(function() {
+    function update() {
+        const el = document.getElementById('header-time-dash');
+        if (!el) return;
+        const now = new Date();
+        const opts = { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' };
+        el.textContent = now.toLocaleDateString('id-ID', opts);
+    }
+    update();
+    setInterval(update, 30000);
+})();
+</script>

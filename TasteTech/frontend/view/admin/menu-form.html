@@ -1,0 +1,228 @@
+<!-- Menu Form (Create / Edit) -->
+<div class="page-top">
+    <div>
+        <h1 class="page-heading">{{if .IsEdit}}Edit Menu{{else}}Tambah Menu Baru{{end}}</h1>
+        <p class="page-sub">{{if .IsEdit}}Perbarui informasi menu yang sudah ada{{else}}Isi form berikut untuk menambahkan menu baru{{end}}</p>
+    </div>
+    <a href="/admin/menu" class="btn-admin-outline" id="back-to-list">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Kembali ke Daftar
+    </a>
+</div>
+
+{{if .Error}}
+<div class="alert alert-error" id="form-error">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+    {{.Error}}
+</div>
+{{end}}
+
+<div class="form-page-layout">
+    <!-- Main Form -->
+    <div class="form-card-main">
+        <form action="{{if .IsEdit}}/admin/menu/{{.Menu.ID}}/edit{{else}}/admin/menu/tambah{{end}}"
+              method="POST" id="menu-form">
+
+            <!-- Nama Menu -->
+            <div class="form-section">
+                <h3 class="form-section-title">Informasi Dasar</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name" class="form-label">Nama Menu <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" class="form-input"
+                               placeholder="Contoh: Nasi Goreng Spesial"
+                               value="{{.Menu.Name}}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category" class="form-label">Kategori <span class="required">*</span></label>
+                        <select id="category" name="category" class="form-input" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            {{range .Categories}}
+                            {{if ne .ID "semua"}}
+                            <option value="{{.ID}}" {{if eq $.Menu.Category .ID}}selected{{end}}>{{.Icon}} {{.Name}}</option>
+                            {{end}}
+                            {{end}}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">Deskripsi</label>
+                    <textarea id="description" name="description" class="form-input form-textarea"
+                              placeholder="Deskripsikan menu dengan menarik...">{{.Menu.Description}}</textarea>
+                </div>
+            </div>
+
+            <!-- Harga dan Rating -->
+            <div class="form-section">
+                <h3 class="form-section-title">Harga & Rating</h3>
+                <div class="form-row three-cols">
+                    <div class="form-group">
+                        <label for="price" class="form-label">Harga (Rp) <span class="required">*</span></label>
+                        <div class="input-prefix-wrap">
+                            <span class="input-prefix-label">Rp</span>
+                            <input type="number" id="price" name="price" class="form-input prefix-input"
+                                   placeholder="25000" min="0" step="500"
+                                   value="{{.Menu.Price}}" required oninput="updatePricePreview()">
+                        </div>
+                        <small class="form-hint" id="price-preview">Preview: Rp 0</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="rating" class="form-label">Rating (0-5)</label>
+                        <input type="number" id="rating" name="rating" class="form-input"
+                               placeholder="4.5" min="0" max="5" step="0.1"
+                               value="{{.Menu.Rating}}" oninput="updateRatingStars()">
+                        <small class="form-hint" id="rating-stars">⭐⭐⭐⭐☆</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status Ketersediaan</label>
+                        <div class="availability-toggle" id="avail-toggle">
+                            <label class="toggle-label">
+                                <input type="radio" name="is_available" value="true"
+                                       {{if .Menu.IsAvailable}}checked{{end}} id="avail-true">
+                                <span class="toggle-option available">✅ Tersedia</span>
+                            </label>
+                            <label class="toggle-label">
+                                <input type="radio" name="is_available" value="false"
+                                       {{if eq .Menu.IsAvailable false}}checked{{end}} id="avail-false">
+                                <span class="toggle-option unavailable">❌ Habis</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gambar -->
+            <div class="form-section">
+                <h3 class="form-section-title">Gambar Menu</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="image" class="form-label">URL Gambar</label>
+                        <input type="text" id="image" name="image" class="form-input"
+                               placeholder="/static/img/nama-gambar.jpg"
+                               value="{{.Menu.Image}}" oninput="previewImage()">
+                        <small class="form-hint">Masukkan path gambar atau URL. Kosongkan untuk gambar default.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Emoji Kategori</label>
+                        <div class="emoji-picker" id="emoji-display">
+                            <div class="emoji-large" id="emoji-preview">🍽️</div>
+                            <div class="emoji-options">
+                                <button type="button" onclick="setEmoji('🍛')" class="emoji-opt">🍛</button>
+                                <button type="button" onclick="setEmoji('🍜')" class="emoji-opt">🍜</button>
+                                <button type="button" onclick="setEmoji('🥤')" class="emoji-opt">🥤</button>
+                                <button type="button" onclick="setEmoji('🍿')" class="emoji-opt">🍿</button>
+                                <button type="button" onclick="setEmoji('🍰')" class="emoji-opt">🍰</button>
+                                <button type="button" onclick="setEmoji('🍔')" class="emoji-opt">🍔</button>
+                                <button type="button" onclick="setEmoji('🍕')" class="emoji-opt">🍕</button>
+                                <button type="button" onclick="setEmoji('🌮')" class="emoji-opt">🌮</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="form-actions">
+                <a href="/admin/menu" class="btn-admin-outline" id="cancel-form">Batal</a>
+                <button type="submit" class="btn-admin-primary" id="submit-form">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    {{if .IsEdit}}Simpan Perubahan{{else}}Tambah Menu{{end}}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preview Sidebar -->
+    <div class="form-preview-sidebar">
+        <div class="preview-card" id="preview-card">
+            <div class="preview-header">
+                <h3>Preview Menu Card</h3>
+            </div>
+            <div class="preview-menu-card">
+                <div class="prev-img">
+                    <div class="prev-emoji" id="prev-emoji">
+                        {{if .Menu.Category}}
+                            {{if eq .Menu.Category "makanan"}}🍛
+                            {{else if eq .Menu.Category "minuman"}}🥤
+                            {{else if eq .Menu.Category "camilan"}}🍿
+                            {{else}}🍰{{end}}
+                        {{else}}🍽️{{end}}
+                    </div>
+                    <div class="prev-badge">⭐ <span id="prev-rating">{{if .Menu.Rating}}{{.Menu.Rating}}{{else}}4.5{{end}}</span></div>
+                </div>
+                <div class="prev-body">
+                    <div class="prev-cat" id="prev-cat">{{if .Menu.Category}}{{.Menu.Category}}{{else}}kategori{{end}}</div>
+                    <h4 class="prev-name" id="prev-name">{{if .Menu.Name}}{{.Menu.Name}}{{else}}Nama Menu{{end}}</h4>
+                    <p class="prev-desc" id="prev-desc">{{if .Menu.Description}}{{.Menu.Description}}{{else}}Deskripsi menu akan tampil di sini...{{end}}</p>
+                    <div class="prev-footer">
+                        <span class="prev-price" id="prev-price">Rp {{if .Menu.Price}}{{formatRupiah .Menu.Price}}{{else}}0{{end}}</span>
+                        <button class="prev-btn">+ Tambah</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="info-card" id="tips-card">
+            <h4>💡 Tips Pengisian</h4>
+            <ul>
+                <li>Nama menu harus jelas dan mudah dimengerti</li>
+                <li>Deskripsi yang menarik meningkatkan penjualan</li>
+                <li>Harga dalam satuan Rupiah (tanpa titik/koma)</li>
+                <li>Rating antara 0.0 - 5.0</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+function updatePricePreview() {
+    const price = parseFloat(document.getElementById('price').value) || 0;
+    const formatted = 'Rp ' + Math.floor(price).toLocaleString('id-ID');
+    document.getElementById('price-preview').textContent = 'Preview: ' + formatted;
+    document.getElementById('prev-price').textContent = formatted;
+}
+
+function updateRatingStars() {
+    const rating = parseFloat(document.getElementById('rating').value) || 0;
+    const full = Math.floor(rating);
+    const stars = '⭐'.repeat(Math.min(full, 5)) + '☆'.repeat(Math.max(0, 5 - full));
+    document.getElementById('rating-stars').textContent = stars;
+    document.getElementById('prev-rating').textContent = rating;
+}
+
+function setEmoji(emoji) {
+    document.getElementById('emoji-preview').textContent = emoji;
+    document.getElementById('prev-emoji').textContent = emoji;
+}
+
+function updateCategoryEmoji() {
+    const cat = document.getElementById('category').value;
+    const emojis = { makanan: '🍛', minuman: '🥤', camilan: '🍿', dessert: '🍰' };
+    const emoji = emojis[cat] || '🍽️';
+    document.getElementById('emoji-preview').textContent = emoji;
+    document.getElementById('prev-emoji').textContent = emoji;
+    document.getElementById('prev-cat').textContent = cat || 'kategori';
+}
+
+// Live preview
+document.getElementById('name').addEventListener('input', e => {
+    document.getElementById('prev-name').textContent = e.target.value || 'Nama Menu';
+});
+document.getElementById('description').addEventListener('input', e => {
+    document.getElementById('prev-desc').textContent = e.target.value || 'Deskripsi menu akan tampil di sini...';
+});
+document.getElementById('category').addEventListener('change', updateCategoryEmoji);
+
+// Initialize preview
+updatePricePreview();
+updateRatingStars();
+
+// Form submit loading state
+document.getElementById('menu-form').addEventListener('submit', function() {
+    const btn = document.getElementById('submit-form');
+    btn.innerHTML = '<span class="spinner-sm"></span> Menyimpan...';
+    btn.disabled = true;
+});
+</script>

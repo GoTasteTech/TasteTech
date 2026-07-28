@@ -1,0 +1,107 @@
+<!-- Login Page -->
+<section class="auth-section">
+    <div class="auth-bg-glow auth-glow-1"></div>
+    <div class="auth-bg-glow auth-glow-2"></div>
+
+    <div class="auth-container">
+        <!-- Brand -->
+        <a href="/" class="auth-brand">
+            <span class="logo-icon">🍽️</span>
+            <span class="logo-text">Taste<span class="logo-accent">Tech</span></span>
+        </a>
+
+        <!-- Card -->
+        <div class="auth-card">
+            {{if .Expired}}
+            <div class="auth-alert auth-alert-warning">
+                ⚠️ Sesi kamu telah berakhir. Silakan login kembali.
+            </div>
+            {{end}}
+            {{if .Error}}
+            <div class="auth-alert auth-alert-error">
+                ❌ {{.Error}}
+            </div>
+            {{end}}
+
+            <div class="auth-header">
+                <div class="auth-icon-wrap">👤</div>
+                <h1 class="auth-title">Selamat Datang!</h1>
+                <p class="auth-subtitle">Masuk ke akun TasteTech kamu</p>
+            </div>
+
+            <form method="POST" action="/login" id="login-form">
+                <input type="hidden" name="redirect" value="{{.Redirect}}">
+
+                <div class="auth-form-group">
+                    <label class="auth-label" for="email">📧 Email</label>
+                    <input
+                        type="email" id="email" name="email"
+                        class="auth-input"
+                        placeholder="nama@email.com"
+                        value="{{.Email}}"
+                        required autocomplete="email">
+                </div>
+
+                <div class="auth-form-group">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <label class="auth-label" for="password" style="margin-bottom:0;">🔒 Password</label>
+                    </div>
+                    <div class="auth-input-wrap">
+                        <input
+                            type="password" id="password" name="password"
+                            class="auth-input"
+                            placeholder="Masukkan password"
+                            required autocomplete="current-password">
+                        <button type="button" class="auth-eye-btn" onclick="togglePassword('password', this)" aria-label="Tampilkan password">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-submit-btn btn-primary" id="login-submit">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:18px;height:18px;"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                    Masuk ke Akun
+                </button>
+            </form>
+
+            <div class="auth-divider"><span>atau</span></div>
+
+            <div class="auth-switch">
+                Belum punya akun?
+                <a href="/daftar" class="auth-switch-link">Daftar Sekarang 🚀</a>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="auth-info-card">
+            <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+                <div class="auth-benefit">
+                    <span>📦</span>
+                    <div>Lacak pesanan real-time</div>
+                </div>
+                <div class="auth-benefit">
+                    <span>⚡</span>
+                    <div>Checkout lebih cepat</div>
+                </div>
+                <div class="auth-benefit">
+                    <span>📜</span>
+                    <div>Riwayat pesanan tersimpan</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    btn.querySelector('.eye-icon').style.opacity = isText ? '1' : '0.4';
+}
+document.getElementById('login-form')?.addEventListener('submit', function() {
+    const btn = document.getElementById('login-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span style="animation:spin .8s linear infinite;display:inline-block">⏳</span> Memproses...';
+});
+</script>

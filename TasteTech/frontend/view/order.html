@@ -1,0 +1,158 @@
+<!-- Order Detail Page -->
+<section class="order-detail-section">
+    <div class="container">
+        <div class="order-detail-card" id="order-detail-card">
+            <!-- Success Header -->
+            <div class="order-status-header">
+                <div class="status-icon-large">
+                    {{if eq .Order.Status "pending"}}🕐
+                    {{else if eq .Order.Status "processing"}}👨‍🍳
+                    {{else if eq .Order.Status "delivery"}}🚀
+                    {{else if eq .Order.Status "completed"}}✅
+                    {{else}}❌{{end}}
+                </div>
+                <h1 class="order-status-title">
+                    {{if eq .Order.Status "pending"}}Pesanan Diterima
+                    {{else if eq .Order.Status "processing"}}Sedang Dimasak
+                    {{else if eq .Order.Status "delivery"}}Dalam Pengiriman
+                    {{else if eq .Order.Status "completed"}}Pesanan Selesai
+                    {{else}}Pesanan Dibatalkan{{end}}
+                </h1>
+                <p class="order-id-badge">ID Pesanan: <strong>{{.Order.ID}}</strong></p>
+            </div>
+
+            <!-- Order Progress -->
+            <div class="order-progress">
+                <div class="progress-step {{if or (eq .Order.Status "pending") (eq .Order.Status "processing") (eq .Order.Status "delivery") (eq .Order.Status "completed")}}done{{end}}" id="prog-1">
+                    <div class="prog-icon">📋</div>
+                    <span>Diterima</span>
+                </div>
+                <div class="progress-line {{if or (eq .Order.Status "processing") (eq .Order.Status "delivery") (eq .Order.Status "completed")}}done{{end}}"></div>
+                <div class="progress-step {{if or (eq .Order.Status "processing") (eq .Order.Status "delivery") (eq .Order.Status "completed")}}done{{else}}{{end}}" id="prog-2">
+                    <div class="prog-icon">👨‍🍳</div>
+                    <span>Dimasak</span>
+                </div>
+                <div class="progress-line {{if or (eq .Order.Status "delivery") (eq .Order.Status "completed")}}done{{end}}"></div>
+                <div class="progress-step {{if or (eq .Order.Status "delivery") (eq .Order.Status "completed")}}done{{end}}" id="prog-3">
+                    <div class="prog-icon">🚀</div>
+                    <span>Dikirim</span>
+                </div>
+                <div class="progress-line {{if eq .Order.Status "completed"}}done{{end}}"></div>
+                <div class="progress-step {{if eq .Order.Status "completed"}}done{{end}}" id="prog-4">
+                    <div class="prog-icon">🏠</div>
+                    <span>Tiba</span>
+                </div>
+            </div>
+
+            <div class="order-detail-body">
+                <!-- Item List -->
+                <div class="order-items-section">
+                    <h2>Item Pesanan</h2>
+                    <div class="order-items-list">
+                        {{range .Order.Items}}
+                        <div class="order-item-row">
+                            <div class="order-item-thumb-wrap">
+                                {{if .Image}}
+                                <img src="{{.Image}}" alt="{{.MenuName}}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;">
+                                {{else}}
+                                <div class="order-item-emoji">🍽️</div>
+                                {{end}}
+                            </div>
+                            <div class="order-item-info">
+                                <strong>{{.MenuName}}</strong>
+                                <span>x{{.Quantity}} × Rp {{formatRupiah .Price}}</span>
+                            </div>
+                            <span class="order-item-total">Rp {{formatRupiah .SubTotal}}</span>
+                        </div>
+                        {{end}}
+                    </div>
+
+                    <div class="order-total-section">
+                        <div class="order-total-row">
+                            <span>Subtotal</span>
+                            <span>Rp {{formatRupiah .Order.Total}}</span>
+                        </div>
+                        <div class="order-total-row">
+                            <span>Ongkos Kirim</span>
+                            <span>Rp {{formatRupiah .Order.DeliveryFee}}</span>
+                        </div>
+                        <div class="order-total-row grand-total">
+                            <span>Total Pembayaran</span>
+                            <span>Rp {{formatRupiah .Order.GrandTotal}}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="customer-info-section">
+                    <h2>Informasi Pengiriman & Pembayaran</h2>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                Nama
+                            </div>
+                            <div class="info-value">{{.Order.CustomerName}}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.61 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.73a16 16 0 0 0 6.29 6.29l.74-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                Telepon
+                            </div>
+                            <div class="info-value">{{.Order.Phone}}</div>
+                        </div>
+                        <div class="info-item full-width">
+                            <div class="info-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                Pembayaran
+                            </div>
+                            <div class="info-value"><strong style="color:#FF8C5A">{{.Order.PaymentMethod}}</strong></div>
+                        </div>
+                        <div class="info-item full-width">
+                            <div class="info-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                Alamat
+                            </div>
+                            <div class="info-value">{{.Order.Address}}</div>
+                        </div>
+                        {{if .Order.Notes}}
+                        <div class="info-item full-width">
+                            <div class="info-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                Catatan
+                            </div>
+                            <div class="info-value">{{.Order.Notes}}</div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="order-actions">
+                {{if or (eq .Order.Status "processing") (eq .Order.Status "delivery")}}
+                <a href="/lacak/{{.Order.ID}}" id="track-delivery-btn"
+                   style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#9C27B0,#E040FB); color:#FFFFFF; padding:12px 22px; border-radius:12px; font-weight:700; text-decoration:none; font-size:0.95rem; transition:transform 0.2s, opacity 0.2s;"
+                   onmouseover="this.style.transform='translateY(-2px)'"
+                   onmouseout="this.style.transform=''">
+                    🚀 Lacak Pengiriman
+                </a>
+                {{else if eq .Order.Status "pending"}}
+                <a href="/lacak/{{.Order.ID}}" id="track-delivery-btn"
+                   style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,193,7,0.15); color:#FFC107; border:1px solid rgba(255,193,7,0.3); padding:12px 22px; border-radius:12px; font-weight:700; text-decoration:none; font-size:0.95rem; transition:transform 0.2s;"
+                   onmouseover="this.style.transform='translateY(-2px)'"
+                   onmouseout="this.style.transform=''">
+                    📍 Pantau Status
+                </a>
+                {{end}}
+                <a href="/riwayat" class="btn-outline" id="view-history-btn">
+                    📜 Riwayat Pesanan
+                </a>
+                <a href="/menu" class="btn-primary" id="order-again-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    Pesan Lagi
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

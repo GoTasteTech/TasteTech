@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <meta name="description" content="TasteTech - Platform pemesanan makanan online terpercaya dengan ribuan menu lezat siap diantar ke pintu Anda">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="nav-logo" id="nav-logo-link">
+            <span class="logo-icon">🍽️</span>
+            <span class="logo-text">Taste<span class="logo-accent">Tech</span></span>
+        </a>
+
+        <ul class="nav-links" id="nav-links">
+            <li><a href="/" class="nav-link {{if eq .Page "home"}}active{{end}}" id="nav-home">Beranda</a></li>
+            <li><a href="/menu" class="nav-link {{if eq .Page "menu"}}active{{end}}" id="nav-menu">Menu</a></li>
+            <li>
+                <a href="/promo" class="nav-link nav-promo-link {{if eq .Page "promo"}}active{{end}}" id="nav-promo">
+                    🔥 Promo
+                </a>
+            </li>
+            <li><a href="/riwayat" class="nav-link {{if eq .Page "history"}}active{{end}}" id="nav-history">📜 Riwayat</a></li>
+            <li><a href="/lacak" class="nav-link {{if or (eq .Page "lacak") (eq .Page "tracking")}}active{{end}}" id="nav-lacak">🚀 Lacak</a></li>
+            <li><a href="#about" class="nav-link" id="nav-about">Tentang Kami</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <a href="/keranjang" class="cart-btn" id="cart-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span class="cart-count" id="cart-count">{{.CartCount}}</span>
+            </a>
+
+            {{if .IsLoggedIn}}
+            <!-- User Dropdown -->
+            <div class="user-dropdown-wrap" id="user-dropdown-wrap">
+                <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown()" aria-label="Menu akun">
+                    <div class="user-avatar-circle">{{slice .UserName 0 1}}</div>
+                    <span class="user-nav-name">{{slice .UserName 0 10}}{{if gt (len .UserName) 10}}…{{end}}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="user-chevron" style="width:14px;height:14px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="user-dropdown-menu" id="user-dropdown-menu">
+                    <div class="user-dropdown-header">
+                        <div class="user-dropdown-avatar">{{slice .UserName 0 1}}</div>
+                        <div>
+                            <div class="user-dropdown-name">{{.UserName}}</div>
+                            <div class="user-dropdown-email">{{.UserEmail}}</div>
+                        </div>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="/profil" class="user-dropdown-item" id="dd-profil">👤 Profil Saya</a>
+                    <a href="/profil" class="user-dropdown-item" id="dd-pesanan">📦 Pesanan Saya</a>
+                    <a href="/lacak" class="user-dropdown-item" id="dd-lacak">🚀 Lacak Pesanan</a>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="/keluar" class="user-dropdown-item user-dropdown-logout" id="dd-logout">🚪 Keluar</a>
+                </div>
+            </div>
+            {{else}}
+            <!-- Login / Daftar Buttons -->
+            <a href="/login" class="btn-login-nav" id="nav-login-btn">Login</a>
+            <a href="/daftar" class="btn-primary btn-register-nav" id="nav-register-btn">Daftar</a>
+            {{end}}
+
+            <a href="/admin" class="btn-admin-nav" id="nav-admin-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Admin
+            </a>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main>
+    {{embed}}
+</main>
+
+<!-- Footer -->
+<footer class="footer" id="about">
+    <div class="footer-container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <span class="logo-icon">🍽️</span>
+                    <span class="logo-text">Taste<span class="logo-accent">Tech</span></span>
+                </div>
+                <p class="footer-desc">Platform pemesanan makanan online terpercaya. Ribuan menu lezat siap diantar ke pintu Anda dengan cepat dan aman dari dapur terbaik Cimahi.</p>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/Darzerok" target="_blank" class="social-link" id="social-ig" aria-label="Instagram">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <a href="https://wa.me/6289668263410" target="_blank" class="social-link" id="social-wa" aria-label="WhatsApp">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    </a>
+                    <a href="mailto:rafliaprsatria@gmail.com" class="social-link" id="social-email" aria-label="Email">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-title">Menu Populer</h4>
+                <ul class="footer-links">
+                    <li><a href="/menu?kategori=makanan" id="footer-makanan">Makanan Berat</a></li>
+                    <li><a href="/menu?kategori=camilan" id="footer-camilan">Camilan</a></li>
+                    <li><a href="/menu?kategori=minuman" id="footer-minuman">Minuman</a></li>
+                    <li><a href="/menu?kategori=dessert" id="footer-dessert">Dessert</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-title">Informasi</h4>
+                <ul class="footer-links">
+                    <li><a href="#" id="footer-about-link">Tentang TasteTech</a></li>
+                    <li><a href="#" id="footer-career">Karir</a></li>
+                    <li><a href="#" id="footer-partner">Mitra Restoran</a></li>
+                    <li><a href="#" id="footer-privacy">Kebijakan Privasi</a></li>
+                    <li><a href="/admin" id="footer-admin">🔐 Admin Panel</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="footer-title">Kontak</h4>
+                <ul class="footer-contact">
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.61 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.73a16 16 0 0 0 6.29 6.29l.74-.9a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        <a href="https://wa.me/6289668263410" style="color:inherit">+62 896-6826-3410</a>
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <a href="mailto:rafliaprsatria@gmail.com" style="color:inherit">rafliaprsatria@gmail.com</a>
+                    </li>
+                    <li>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        <span>Cimahi, Jawa Barat, Indonesia</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 TasteTech. Dibuat dengan ❤️ menggunakan Go + Fiber</p>
+            <div class="footer-badges">
+                <span class="badge">🔒 SSL Secure</span>
+                <span class="badge">⚡ Fast Delivery</span>
+                <span class="badge">📍 Cimahi</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Toast Notification -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/static/js/app.js"></script>
+<script>
+// User Dropdown Toggle
+function toggleUserDropdown() {
+    const menu = document.getElementById('user-dropdown-menu');
+    const wrap = document.getElementById('user-dropdown-wrap');
+    if (!menu) return;
+    const isOpen = menu.classList.contains('open');
+    menu.classList.toggle('open', !isOpen);
+    wrap.classList.toggle('active', !isOpen);
+}
+document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('user-dropdown-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('user-dropdown-menu')?.classList.remove('open');
+        wrap.classList.remove('active');
+    }
+});
+</script>
+</body>
+</html>

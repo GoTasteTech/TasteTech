@@ -1,0 +1,180 @@
+<!-- Menu Page -->
+<section class="menu-page-section">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Semua <span class="gradient-text">Menu</span></h1>
+            <p class="page-subtitle">Pilih menu lezat favorit Anda dari koleksi lengkap kami</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container" id="search-container">
+            <div class="search-box">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="search-input" placeholder="Cari menu favorit Anda..." class="search-input" oninput="filterMenus()">
+                <button class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">✕</button>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-container" id="filter-container">
+            {{range .Categories}}
+            <button class="filter-btn {{if eq $.ActiveCat .ID}}active{{end}}"
+                    id="filter-{{.ID}}"
+                    onclick="filterByCategory('{{.ID}}')"
+                    data-category="{{.ID}}">
+                {{.Icon}} {{.Name}}
+            </button>
+            {{end}}
+        </div>
+
+        <!-- Menu Count -->
+        <div class="menu-count" id="menu-count">
+            <span id="count-text">Menampilkan <strong>{{len .Menus}}</strong> menu</span>
+        </div>
+
+        <!-- Menu Grid -->
+        <div class="menu-grid" id="menu-grid">
+            {{range .Menus}}
+            <div class="menu-card" id="menu-item-{{.ID}}" data-category="{{.Category}}" data-name="{{.Name}}" data-price="{{.Price}}">
+                <div class="menu-card-img">
+                    <div class="menu-emoji">
+                        {{if eq .Category "makanan"}}🍛{{else if eq .Category "minuman"}}🥤{{else if eq .Category "camilan"}}🍿{{else}}🍰{{end}}
+                    </div>
+                    <div class="menu-badge">⭐ {{.Rating}}</div>
+                    {{if eq .IsAvailable false}}
+                    <div class="menu-unavailable">Habis</div>
+                    {{end}}
+                    <div class="menu-category-overlay">{{.Category}}</div>
+                </div>
+                <div class="menu-card-body">
+                    <div class="menu-category-tag">{{.Category}}</div>
+                    <h3 class="menu-name">{{.Name}}</h3>
+                    <p class="menu-desc">{{.Description}}</p>
+                    <div class="menu-meta">
+                        <span class="menu-sold">🔥 {{.Sold}} terjual</span>
+                        <span class="menu-rating-text">{{.Rating}}/5.0</span>
+                    </div>
+                    <div class="menu-card-footer">
+                        <span class="menu-price">Rp {{formatRupiah .Price}}</span>
+                        <div class="menu-actions">
+                            {{if .IsAvailable}}
+                            <div class="qty-control" id="qty-{{.ID}}" style="display:none">
+                                <button class="qty-btn" onclick="changeQty({{.ID}}, -1)" id="qty-minus-{{.ID}}">−</button>
+                                <span class="qty-value" id="qty-val-{{.ID}}">1</span>
+                                <button class="qty-btn" onclick="changeQty({{.ID}}, 1)" id="qty-plus-{{.ID}}">+</button>
+                            </div>
+                            <button class="add-to-cart-btn" id="add-btn-{{.ID}}"
+                                    onclick="showQtyControl({{.ID}}, '{{.Name}}')"
+                                    data-menu-id="{{.ID}}"
+                                    data-menu-name="{{.Name}}">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Tambah
+                            </button>
+                            {{else}}
+                            <button class="add-to-cart-btn disabled" disabled>Habis</button>
+                            {{end}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state" style="display:none">
+            <div class="empty-emoji">🔍</div>
+            <h3>Menu tidak ditemukan</h3>
+            <p>Coba kata kunci lain atau pilih kategori berbeda</p>
+            <button class="btn-primary" onclick="clearSearch()">Reset Filter</button>
+        </div>
+    </div>
+</section>
+
+<script>
+let currentCategory = '{{.ActiveCat}}';
+let searchQuery = '';
+
+function filterByCategory(category) {
+    currentCategory = category;
+    // Update URL
+    const url = new URL(window.location);
+    url.searchParams.set('kategori', category);
+    window.history.pushState({}, '', url);
+
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === category);
+    });
+
+    applyFilters();
+}
+
+function filterMenus() {
+    searchQuery = document.getElementById('search-input').value.toLowerCase();
+    const clearBtn = document.getElementById('search-clear');
+    clearBtn.style.display = searchQuery ? 'block' : 'none';
+    applyFilters();
+}
+
+function clearSearch() {
+    document.getElementById('search-input').value = '';
+    searchQuery = '';
+    document.getElementById('search-clear').style.display = 'none';
+    applyFilters();
+}
+
+function applyFilters() {
+    const cards = document.querySelectorAll('.menu-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        const category = card.dataset.category;
+        const name = card.dataset.name.toLowerCase();
+        const matchCat = currentCategory === 'semua' || category === currentCategory;
+        const matchSearch = !searchQuery || name.includes(searchQuery);
+
+        if (matchCat && matchSearch) {
+            card.style.display = '';
+            card.style.animation = 'fadeInUp 0.3s ease forwards';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    document.getElementById('count-text').innerHTML = `Menampilkan <strong>${visibleCount}</strong> menu`;
+    document.getElementById('empty-state').style.display = visibleCount === 0 ? 'flex' : 'none';
+}
+
+function showQtyControl(menuId, menuName) {
+    const qtyControl = document.getElementById(`qty-${menuId}`);
+    const addBtn = document.getElementById(`add-btn-${menuId}`);
+
+    qtyControl.style.display = 'flex';
+    addBtn.textContent = 'Tambah ke Keranjang';
+    addBtn.onclick = () => addToCartWithQty(menuId, menuName);
+}
+
+function changeQty(menuId, delta) {
+    const qtyEl = document.getElementById(`qty-val-${menuId}`);
+    let qty = parseInt(qtyEl.textContent) + delta;
+    if (qty < 1) qty = 1;
+    if (qty > 20) qty = 20;
+    qtyEl.textContent = qty;
+}
+
+function addToCartWithQty(menuId, menuName) {
+    const qty = parseInt(document.getElementById(`qty-val-${menuId}`).textContent);
+    addToCart(menuId, menuName, qty);
+
+    // Reset UI
+    const qtyControl = document.getElementById(`qty-${menuId}`);
+    const addBtn = document.getElementById(`add-btn-${menuId}`);
+    document.getElementById(`qty-val-${menuId}`).textContent = '1';
+    qtyControl.style.display = 'none';
+    addBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Tambah`;
+    addBtn.onclick = () => showQtyControl(menuId, menuName);
+}
+</script>
+

@@ -1,0 +1,138 @@
+<!-- Cart Page -->
+<section class="cart-page-section">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Keranjang <span class="gradient-text">Belanja</span></h1>
+            <p class="page-subtitle">Review pesanan Anda sebelum checkout</p>
+        </div>
+
+        {{if .Cart.IsEmpty}}
+        <!-- Empty Cart -->
+        <div class="empty-cart" id="empty-cart">
+            <div class="empty-cart-icon">🛒</div>
+            <h2>Keranjang Masih Kosong</h2>
+            <p>Yuk, tambahkan menu favorit kamu ke keranjang!</p>
+            <a href="/menu" class="btn-primary" id="browse-menu-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                Jelajahi Menu
+            </a>
+        </div>
+        {{else}}
+        <!-- Cart Content -->
+        <div class="cart-layout" id="cart-layout">
+            <!-- Cart Items -->
+            <div class="cart-items-section">
+                <div class="cart-header">
+                    <h2>Item Pesanan <span class="badge-count">{{.Cart.ItemCount}}</span></h2>
+                    <button class="clear-cart-btn" id="clear-cart-btn" onclick="clearCart()">Hapus Semua</button>
+                </div>
+
+                <div class="cart-items" id="cart-items">
+                    {{range .Cart.Items}}
+                    <div class="cart-item" id="cart-item-{{.MenuID}}" data-menu-id="{{.MenuID}}">
+                        <div class="cart-item-img">
+                            <div class="cart-item-emoji">🍽️</div>
+                        </div>
+                        <div class="cart-item-info">
+                            <h3 class="cart-item-name">{{.MenuName}}</h3>
+                            <p class="cart-item-price">Rp {{formatRupiah .Price}} / porsi</p>
+                        </div>
+                        <div class="cart-item-qty">
+                            <button class="qty-btn" onclick="updateCartItem({{.MenuID}}, {{.Quantity}} - 1)" id="cart-minus-{{.MenuID}}">−</button>
+                            <span class="qty-display" id="cart-qty-{{.MenuID}}">{{.Quantity}}</span>
+                            <button class="qty-btn" onclick="updateCartItem({{.MenuID}}, {{.Quantity}} + 1)" id="cart-plus-{{.MenuID}}">+</button>
+                        </div>
+                        <div class="cart-item-subtotal">
+                            <span class="subtotal-label">Subtotal</span>
+                            <span class="subtotal-value" id="subtotal-{{.MenuID}}">Rp {{formatRupiah .SubTotal}}</span>
+                        </div>
+                        <button class="remove-item-btn" onclick="removeFromCart({{.MenuID}})" id="remove-{{.MenuID}}" title="Hapus item">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+                        </button>
+                    </div>
+                    {{end}}
+                </div>
+
+                <div class="cart-continue">
+                    <a href="/menu" class="btn-outline" id="continue-shopping-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Lanjut Belanja
+                    </a>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary-panel">
+                <div class="summary-card" id="summary-card">
+                    <h2 class="summary-title">Ringkasan Pesanan</h2>
+
+                    <div class="summary-rows">
+                        <div class="summary-row">
+                            <span>Subtotal ({{.Cart.ItemCount}} item)</span>
+                            <span id="summary-subtotal">Rp {{formatRupiah .Cart.Total}}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Ongkos Kirim</span>
+                            <span id="summary-delivery">Rp {{formatRupiah .DeliveryFee}}</span>
+                        </div>
+                        <div class="summary-row promo-row" id="promo-row" style="display:none">
+                            <span>Promo</span>
+                            <span class="promo-discount" id="promo-discount">-Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span class="total-amount" id="summary-total">Rp {{formatRupiah .GrandTotal}}</span>
+                    </div>
+
+                    <!-- Promo Code Input -->
+                    <div class="promo-input-section">
+                        <input type="text" id="promo-code-input" placeholder="Kode Promo (TasteTech2026)" class="promo-input">
+                        <button class="promo-apply-btn" id="promo-apply-btn" onclick="applyPromo()">Terapkan</button>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <a href="/checkout" class="checkout-btn" id="checkout-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        Lanjut ke Checkout
+                    </a>
+
+                    <div class="summary-security">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        Transaksi Aman & Terenkripsi
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</section>
+
+<script>
+function clearCart() {
+    if (confirm('Hapus semua item dari keranjang?')) {
+        // Hapus satu per satu
+        const items = document.querySelectorAll('.cart-item');
+        items.forEach(item => {
+            const menuId = item.dataset.menuId;
+            fetch(`/api/cart/remove/${menuId}`, { method: 'DELETE' });
+        });
+        setTimeout(() => location.reload(), 500);
+    }
+}
+
+function applyPromo() {
+    const code = document.getElementById('promo-code-input').value.toUpperCase();
+    if (code === 'TasteTech2026') {
+        document.getElementById('promo-row').style.display = 'flex';
+        document.getElementById('promo-discount').textContent = '-Rp 5.000';
+        showToast('Kode promo berhasil diterapkan!', 'success');
+    } else {
+        showToast('Kode promo tidak valid', 'error');
+    }
+}
+</script>
+
